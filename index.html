@@ -10,30 +10,30 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 .header{background:linear-gradient(135deg,#1e293b,#0f172a);padding:24px 32px;border-bottom:1px solid #334155}
 .header h1{font-size:1.8rem;font-weight:700;color:#f8fafc}
 .header p{color:#94a3b8;margin-top:4px;font-size:.9rem}
-.refresh-bar{background:#1e293b;padding:8px 32px;font-size:.8rem;color:#64748b;display:flex;justify-content:space-between;align-items:center}
-.refresh-bar a{color:#38bdf8;text-decoration:none;cursor:pointer}
-.container{padding:24px 32px}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}
-.kpi-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;text-align:center}
-.kpi-card .label{font-size:.75rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.kpi-card .value{font-size:2rem;font-weight:700;color:#f8fafc}
-.kpi-card .value.green{color:#4ade80}
-.kpi-card .value.blue{color:#38bdf8}
-.kpi-card .value.yellow{color:#fbbf24}
-.date-section{margin-bottom:28px}
-.date-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#1e293b;border-radius:10px 10px 0 0;border:1px solid #334155;border-bottom:none}
-.date-header h2{font-size:1rem;font-weight:600;color:#f1f5f9;text-transform:capitalize}
-.hoy-badge{background:#22c55e;color:white;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase}
-.date-count{margin-left:auto;font-size:.75rem;color:#64748b}
+.rbar{background:#1e293b;padding:8px 32px;font-size:.8rem;color:#64748b;display:flex;justify-content:space-between;align-items:center}
+.rbar a{color:#38bdf8;text-decoration:none;cursor:pointer}
+.cont{padding:24px 32px}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}
+.kcard{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;text-align:center}
+.kcard .lbl{font-size:.75rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.kcard .val{font-size:2rem;font-weight:700;color:#f8fafc}
+.kcard .val.g{color:#4ade80}
+.kcard .val.b{color:#38bdf8}
+.kcard .val.y{color:#fbbf24}
+.dsec{margin-bottom:28px}
+.dhdr{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#1e293b;border-radius:10px 10px 0 0;border:1px solid #334155;border-bottom:none}
+.dhdr h2{font-size:1rem;font-weight:600;color:#f1f5f9;text-transform:capitalize}
+.hoy{background:#22c55e;color:white;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase}
+.dcnt{margin-left:auto;font-size:.75rem;color:#64748b}
 .tbl{width:100%;border-collapse:collapse;background:#1e293b;border:1px solid #334155;border-radius:0 0 10px 10px;overflow:hidden}
 .tbl th{background:#0f172a;padding:10px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#64748b;font-weight:600}
 .tbl td{padding:12px 14px;font-size:.875rem;border-top:1px solid #0f172a;background:#1e293b}
 .tbl tr:hover td{background:#0f172a}
 .paid{color:#4ade80;font-weight:700}
 .zero{color:#f87171}
-.empty{color:#475569;font-style:italic}
-.loading{text-align:center;padding:60px;color:#64748b}
-.error-msg{text-align:center;padding:60px;color:#f87171}
+.emp{color:#475569;font-style:italic}
+.msg{text-align:center;padding:60px;color:#64748b}
+.err{text-align:center;padding:60px;color:#f87171}
 </style>
 </head>
 <body>
@@ -41,27 +41,101 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 <h1>&#127919; Dashboard Admision Marzo 2026</h1>
 <p>Seguimiento de sesiones y pagos de 1ra llamada</p>
 </div>
-<div class="refresh-bar">
+<div class="rbar">
 <span id="lu">Cargando...</span>
 <a onclick="run()">&#8635; Refrescar</a>
 </div>
-<div class="container">
-<div class="kpi-grid">
-<div class="kpi-card"><div class="label">Total Agendas</div><div class="value blue" id="k1">&#8212;</div></div>
-<div class="kpi-card"><div class="label">Pagaron</div><div class="value green" id="k2">&#8212;</div></div>
-<div class="kpi-card"><div class="label">Cash 1ra Llamada</div><div class="value green" id="k3">&#8212;</div></div>
-<div class="kpi-card"><div class="label">Tasa de Cierre</div><div class="value yellow" id="k4">&#8212;</div></div>
+<div class="cont">
+<div class="kgrid">
+<div class="kcard"><div class="lbl">Total Agendas</div><div class="val b" id="k1">&#8212;</div></div>
+<div class="kcard"><div class="lbl">Pagaron</div><div class="val g" id="k2">&#8212;</div></div>
+<div class="kcard"><div class="lbl">Cash 1ra Llamada</div><div class="val g" id="k3">&#8212;</div></div>
+<div class="kcard"><div class="lbl">Tasa de Cierre</div><div class="val y" id="k4">&#8212;</div></div>
 </div>
-<div id="sc"><div class="loading">Cargando sesiones...</div></div>
+<div id="sc"><div class="msg">Cargando sesiones...</div></div>
 </div>
 <script>
 var SH='https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
-function csv(t){var R=[],r=[],c='',q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(ch==='"'){if(q&&t[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){r.push(c);c='';}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';R.push(r);r=[];}else c+=ch;}if(r.length){r.push(c);R.push(r);}return R;}
-function pm(v){if(!v||!v.trim()||v.trim()==='?')return null;var n=parseFloat(v.replace(/[^0-9.-]/g,'').replace(',','.'));return isNaN(n)?null:n;}
-function fm(n){return n===null?'&#8212;':'$'+n.toLocaleString('es-AR');}
-function dl(s){if(!s)return s;var p=s.split('/');if(p.length!==3)return s;var d=new Date(+p[2],+p[0]-1,+p[1]);var dn=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];var mn=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];return dn[d.getDay()]+' '+d.getDate()+' '+mn[d.getMonth()]+' '+p[2];}
-function it(s){if(!s)return false;var p=s.split('/');if(p.length!==3)return false;var n=new Date();return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();}
-async function run(){var c=document.getElementById('sc');try{var r=await fetch(SH+'&t='+Date.now());var tx=await r.text();var rows=csv(tx);if(rows.length<2){c.innerHTML='<div class="error-msg">Sin datos.</div>';return;}var ses=[];for(var i=1;i<rows.length;i++){var rw=rows[i];var fe=rw[10]?rw[10].trim():'';var mo=rw[11]?rw[11].trim():'';var no=rw[2]?rw[2].trim():'';if(!fe||!/\d+\/\d+\/\d+/.test(fe))continue;ses.push({n:no,f:fe,m:mo,mn:pm(mo)});}var g={},o=[];for(var s of ses){if(!g[s.f]){g[s.f]=[];o.push(s.f);}g[s.f].push(s);}var tot=ses.length;var pd=ses.filter(function(x){return x.mn>0;});var ca=pd.reduce(function(a,x){return a+x.mn;},0);var rt=tot>0?Math.round(pd.length/tot*100):0;document.getElementById('k1').textContent=tot;document.getElementById('k2').textContent=pd.length;document.getElementById('k3').textContent='$'+ca.toLocaleString('es-AR');document.getElementById('k4').textContent=rt+'%';var h='';for(var fe of o){var ls=g[fe];var lab=dl(fe);var hoy=it(fe);var pc=ls.filter(function(x){return x.mn>0;}).length;var fc=ls.filter(function(x){return x.mn>0;}).reduce(function(a,x){return a+x.mn;},0);h+='<div class="date-section"><div class="date-header"><h2>'+lab+'</h2>';if(hoy)h+='<span class="hoy-badge">HOY</span>';h+='<span class="date-count">'+pc+'/'+ls.length+' pagaron &middot; $'+fc.toLocaleString('es-AR')+'</span></div><table class="tbl"><thead><tr><th>#</th><th>Nombre</th><th>Monto 1ra Llamada</th></tr></thead><tbody>';ls.forEach(function(x,i){var cl='empty',dp='&#8212;';if(x.mn>0){cl='paid';dp='$'+x.mn.toLocaleString('es-AR');}else if(x.m){cl='zero';dp=x.m;}h+='<tr><td style="color:#475569">'+(i+1)+'</td><td>'+(x.n||'-')+'</td><td class="'+cl+'">'+dp+'</td></tr>';});h+='</tbody></table></div>';}c.innerHTML=h||'<div class="loading">Sin sesiones aun.</div>';var nd=new Date();document.getElementById('lu').textContent='Actualizado: '+nd.toLocaleTimeString('es-AR')+' (auto 60s)';}catch(e){c.innerHTML='<div class="error-msg">Error: '+e.message+'</div>';}}
+var MES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,octubre:10,noviembre:11,diciembre:12};
+function csv(t){var R=[],rw=[],c='',q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(ch==='"'){if(q&&t[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){rw.push(c);c='';}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&t[i+1]==='\n')i++;rw.push(c);c='';R.push(rw);rw=[];}else c+=ch;}if(rw.length){rw.push(c);R.push(rw);}return R;}
+function pf(col1){
+  if(!col1)return null;
+  var m=col1.match(/,\s*(\d+)\s+de\s+(\w+)/i);
+  if(!m)return null;
+  var dd=+m[1],mes=MES[m[2].toLowerCase()];
+  if(!mes)return null;
+  var yr=2026;
+  return mes+'/'+dd+'/'+yr;
+}
+function pm(v){
+  if(!v||!v.trim()||v.trim()==='?')return null;
+  var s=v.replace(/\$/g,'').replace(/\./g,'').replace(',','.');
+  var n=parseFloat(s);
+  return isNaN(n)?null:n;
+}
+function fm(n){return n===null?'&#8212;':'$'+n.toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function dl(fe){
+  var p=fe.split('/');if(p.length!==3)return fe;
+  var d=new Date(+p[2],+p[0]-1,+p[1]);
+  var dn=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+  var mn=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  return dn[d.getDay()]+' '+d.getDate()+' '+mn[+p[0]-1]+' '+p[2];
+}
+function it(fe){
+  var p=fe.split('/');if(p.length!==3)return false;
+  var n=new Date();
+  return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();
+}
+async function run(){
+  var c=document.getElementById('sc');
+  try{
+    var r=await fetch(SH+'&t='+Date.now());
+    var tx=await r.text();
+    var rows=csv(tx);
+    if(rows.length<2){c.innerHTML='<div class="err">Sin datos.</div>';return;}
+    var ses=[];
+    for(var i=1;i<rows.length;i++){
+      var rw=rows[i];
+      var fe=pf(rw[1]);
+      if(!fe)continue;
+      var mo=rw[11]?rw[11].trim():'';
+      var no=rw[2]?rw[2].trim():'';
+      ses.push({n:no,f:fe,m:mo,mn:pm(mo)});
+    }
+    var g={},o=[];
+    for(var s of ses){if(!g[s.f]){g[s.f]=[];o.push(s.f);}g[s.f].push(s);}
+    var tot=ses.length;
+    var pd=ses.filter(function(x){return x.mn!==null&&x.mn>0;});
+    var ca=pd.reduce(function(a,x){return a+x.mn;},0);
+    var rt=tot>0?Math.round(pd.length/tot*100):0;
+    document.getElementById('k1').textContent=tot;
+    document.getElementById('k2').textContent=pd.length;
+    document.getElementById('k3').textContent=fm(ca);
+    document.getElementById('k4').textContent=rt+'%';
+    var h='';
+    for(var fe of o){
+      var ls=g[fe];var lab=dl(fe);var hoy=it(fe);
+      var pc=ls.filter(function(x){return x.mn!==null&&x.mn>0;}).length;
+      var fc=ls.filter(function(x){return x.mn!==null&&x.mn>0;}).reduce(function(a,x){return a+x.mn;},0);
+      h+='<div class="dsec"><div class="dhdr"><h2>'+lab+'</h2>';
+      if(hoy)h+='<span class="hoy">HOY</span>';
+      h+='<span class="dcnt">'+pc+'/'+ls.length+' pagaron &middot; '+fm(fc)+'</span></div>';
+      h+='<table class="tbl"><thead><tr><th>#</th><th>Nombre</th><th>Monto 1ra Llamada</th></tr></thead><tbody>';
+      ls.forEach(function(x,i){
+        var cl='emp',dp='&#8212;';
+        if(x.mn!==null&&x.mn>0){cl='paid';dp=fm(x.mn);}
+        else if(x.m&&x.m!==''){cl='zero';dp=x.m;}
+        h+='<tr><td style="color:#475569">'+(i+1)+'</td><td>'+(x.n||'-')+'</td><td class="'+cl+'">'+dp+'</td></tr>';
+      });
+      h+='</tbody></table></div>';
+    }
+    c.innerHTML=h||'<div class="msg">Sin sesiones aun.</div>';
+    var nd=new Date();
+    document.getElementById('lu').textContent='Actualizado: '+nd.toLocaleTimeString('es-AR')+' (auto 60s)';
+  }catch(e){
+    c.innerHTML='<div class="err">Error: '+e.message+'</div>';
+  }
+}
 run();setInterval(run,60000);
 </script>
 </body>
