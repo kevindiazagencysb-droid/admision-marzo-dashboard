@@ -19,7 +19,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 .panel{display:none;padding:24px 32px}
 .panel.active{display:block}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
-.kcard{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:18px 16px;text-align:center;position:relative}
+.kcard{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:18px 16px;text-align:center}
 .kcard .lbl{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .kcard .val{font-size:1.8rem;font-weight:700;color:#f8fafc}
 .kcard .val.g{color:#4ade80}
@@ -31,7 +31,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 .dsec{margin-bottom:24px}
 .dhdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#1e293b;border-radius:8px 8px 0 0;border:1px solid #334155;border-bottom:none}
 .dhdr h2{font-size:.9rem;font-weight:700;color:#f1f5f9;text-transform:capitalize}
-.hoy{background:#22c55e;color:white;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+.hoy{background:#22c55e;color:white;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase}
 .dcnt{margin-left:auto;font-size:.72rem;color:#64748b;text-align:right}
 .tbl{width:100%;border-collapse:collapse;background:#1e293b;border:1px solid #334155;border-radius:0 0 8px 8px;overflow:hidden;font-size:.82rem}
 .tbl th{background:#0f172a;padding:9px 12px;text-align:left;font-size:.65rem;text-transform:uppercase;color:#64748b;font-weight:600;letter-spacing:.04em}
@@ -48,21 +48,22 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 .badge-comp{background:#0f3d2a;color:#34d399}
 .badge-sa{background:#2d1b4e;color:#c084fc}
 .badge-reimb{background:#3d0f0f;color:#f87171}
+.badge-canal{background:#1e3a5f;color:#60a5fa}
+.prog-bar{width:100%;background:#334155;border-radius:4px;height:8px;margin-top:6px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#22c55e,#4ade80)}
+.stitle{font-size:.8rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #334155}
 .msg{text-align:center;padding:50px;color:#64748b}
 .err{text-align:center;padding:50px;color:#f87171}
-.prog-bar{width:100%;background:#334155;border-radius:4px;height:8px;margin-top:6px;overflow:hidden}
-.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .5s}
-.section-title{font-size:.8rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #334155}
 </style>
 </head>
 <body>
 <div class="header">
   <h1>&#127919; Dashboard Admision Marzo 2026</h1>
-  <p>Seguimiento de sesiones · pagos de 1ra llamada · admision al programa</p>
+  <p>Seguimiento de sesiones - pagos de 1ra llamada - admision al programa</p>
 </div>
 <div class="rbar">
   <span id="lu">Cargando...</span>
-  <a onclick="run()">&#8635; Refrescar ahora</a>
+  <a onclick="run()">&#8635; Refrescar</a>
 </div>
 <div class="tabs">
   <div class="tab active" onclick="showTab('t1',this)">&#128198; Por Fecha</div>
@@ -76,341 +77,284 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 var SH1='https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
 var SH2='https://docs.google.com/spreadsheets/d/1BfB80DmKnR2XKu8gPB2tc-z-xH9CvtgH60cU4SjfQgU/gviz/tq?tqx=out:csv&sheet=PAGOS';
 var MES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,octubre:10,noviembre:11,diciembre:12};
-
-function showTab(id,el){
-  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
-  document.getElementById(id).classList.add('active');
-  el.classList.add('active');
-}
-
-function csv(t){var R=[],rw=[],c='',q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(ch==='"'){if(q&&t[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){rw.push(c);c='';}else if((ch==='
-'||ch==='
-')&&!q){if(ch==='
-'&&t[i+1]==='
-')i++;rw.push(c);c='';R.push(rw);rw=[];}else c+=ch;}if(rw.length){rw.push(c);R.push(rw);}return R;}
-
-function pm(v){
-  if(!v||!v.trim()||v.trim()==='?')return null;
-  var s=v.replace(/\$/g,'').replace(/\s/g,'').replace(/\./g,'').replace(',','.');
-  var n=parseFloat(s);
-  return isNaN(n)?null:n;
-}
-function fm(n){return (n===null||n===undefined)?'&#8212;':'$'+Math.round(n).toLocaleString('es-AR');}
-
-function pf(col1){
-  if(!col1)return null;
-  var m=col1.match(/,\s*(\d+)\s+de\s+(\w+)/i);
-  if(!m)return null;
-  var dd=+m[1],mes=MES[m[2].toLowerCase()];
-  if(!mes)return null;
-  return mes+'/'+dd+'/2026';
-}
-function dl(fe){
-  var p=fe.split('/');if(p.length!==3)return fe;
-  var d=new Date(+p[2],+p[0]-1,+p[1]);
-  var dn=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
-  var mn=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sep','Oct','Nov','Dic'];
-  return dn[d.getDay()]+' '+d.getDate()+' '+mn[+p[0]-1]+' '+p[2];
-}
-function dlLong(fe){
-  var p=fe.split('/');if(p.length!==3)return fe;
-  var d=new Date(+p[2],+p[0]-1,+p[1]);
-  var dn=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
-  var mn=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  return dn[d.getDay()]+' '+d.getDate()+' '+mn[+p[0]-1]+' '+p[2];
-}
-function it(fe){
-  var p=fe.split('/');if(p.length!==3)return false;
-  var n=new Date();
-  return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();
-}
-function parseAdmFecha(s){
-  if(!s||!s.trim())return '';
-  // Format: "27 Mar 2026" or "31/03/2026"
-  var m=s.match(/(\d+)[\s\/](\w+)[\s\/](\d{4})/);
-  if(!m)return '';
-  var dd=+m[1];
-  var mesStr=m[2].toLowerCase();
-  var yr=+m[3];
-  var mNum=MES[mesStr]||(isNaN(+mesStr)?0:+mesStr);
-  if(!mNum)return '';
-  return mNum+'/'+dd+'/'+yr;
-}
+function showTab(id,el){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById(id).classList.add('active');el.classList.add('active');}
+function csv(t){var R=[],rw=[],c='',q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(ch==='"'){if(q&&t[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){rw.push(c);c='';}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&t[i+1]==='\n')i++;rw.push(c);c='';R.push(rw);rw=[];}else c+=ch;}if(rw.length){rw.push(c);R.push(rw);}return R;}
+function pm(v){if(!v||!v.trim()||v.trim()==='?')return null;var s=v.replace(/\$/g,'').trim().replace(/\./g,'').replace(',','.');var n=parseFloat(s);return isNaN(n)?null:n;}
+function fm(n){return (n===null||n===undefined||n===0&&n!==0)?'&#8212;':n===0?'$0':'$'+Math.round(n).toLocaleString('es-AR');}
+function pf(col1){if(!col1)return null;var m=col1.match(/,\s*(\d+)\s+de\s+(\w+)/i);if(!m)return null;var dd=+m[1],mes=MES[m[2].toLowerCase()];if(!mes)return null;return mes+'/'+dd+'/2026';}
+function dl(fe){var p=fe.split('/');if(p.length!==3)return fe;var d=new Date(+p[2],+p[0]-1,+p[1]);var dn=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];var mn=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sep','Oct','Nov','Dic'];return dn[d.getDay()]+' '+d.getDate()+' '+mn[+p[0]-1]+' '+p[2];}
+function it(fe){var p=fe.split('/');if(p.length!==3)return false;var n=new Date();return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();}
+function paf(s){if(!s||!s.trim())return '';var m=s.match(/(\d+)[\s\/](\w+)[\s\/](\d{4})/);if(!m)return '';var dd=+m[1],mesStr=m[2].toLowerCase(),yr=+m[3];var mNum=MES[mesStr]||(isNaN(+mesStr)?0:+mesStr);if(!mNum)return '';return mNum+'/'+dd+'/'+yr;}
 
 async function run(){
   document.getElementById('lu').textContent='Actualizando...';
   try{
-    var [r1,r2]=await Promise.all([
-      fetch(SH1+'&t='+Date.now()).then(function(r){return r.text();}),
-      fetch(SH2+'&t='+Date.now()).then(function(r){return r.text();})
-    ]);
+    var [r1,r2]=await Promise.all([fetch(SH1+'&t='+Date.now()).then(function(r){return r.text();}),fetch(SH2+'&t='+Date.now()).then(function(r){return r.text();})]);
+    var rows1=csv(r1),rows2=csv(r2);
     
-    var rows1=csv(r1);
-    var rows2=csv(r2);
-    
-    // Parse sessions from SH1 (Luis Clientes Marzo)
     var ses=[];
     for(var i=1;i<rows1.length;i++){
-      var rw=rows1[i];
-      var fe=pf(rw[1]);
-      if(!fe)continue;
-      var mn=pm(rw[11]);
-      ses.push({
-        nombre:rw[2]?rw[2].trim():'',
-        fecha:fe,
-        monto:rw[11]?rw[11].trim():'',
-        montoN:mn,
-        planStatus:rw[15]?rw[15].trim():'',
-        totalCollected:pm(rw[16]),
-        remaining:pm(rw[17]),
-        planPago:rw[19]?rw[19].trim():'',
-        payMethod:rw[13]?rw[13].trim():''
-      });
+      var rw=rows1[i];var fe=pf(rw[1]);if(!fe)continue;
+      ses.push({nombre:rw[2]?rw[2].trim():'',fecha:fe,monto:rw[11]?rw[11].trim():'',montoN:pm(rw[11]),planStatus:rw[15]?rw[15].trim():'',totalCollected:pm(rw[16]),remaining:pm(rw[17]),planPago:rw[19]?rw[19].trim():'',payMethod:rw[13]?rw[13].trim():''});
     }
     
-    // Parse admision from SH2 (PAGOS)
     var adm=[];
     for(var i=1;i<rows2.length;i++){
-      var rw=rows2[i];
-      if(!rw[1]||!rw[1].trim())continue;
-      var fe=parseAdmFecha(rw[13]);
-      var p1=pm(rw[5]);
-      var p2=pm(rw[7]);
-      var p3=pm(rw[9]);
-      var p4=pm(rw[11]);
-      var total=(p1||0)+(p2||0)+(p3||0)+(p4||0);
-      var cuotas=p2!==null||p3!==null||p4!==null;
-      adm.push({
-        nombre:rw[1]?rw[1].trim():'',
-        email:rw[2]?rw[2].trim():'',
-        canal:rw[3]?rw[3].trim():'',
-        reembolso:rw[4]?rw[4].trim():'',
-        pago1:p1, fechaP1:rw[6]?rw[6].trim():'',
-        pago2:p2, fechaP2:rw[8]?rw[8].trim():'',
-        pago3:p3, fechaP3:rw[10]?rw[10].trim():'',
-        pago4:p4, fechaP4:rw[12]?rw[12].trim():'',
-        fechaAgenda:fe,
-        hora:rw[14]?rw[14].trim():'',
-        estado:rw[15]?rw[15].trim():'',
-        totalPagado:total,
-        esCuotas:cuotas,
-        reembolsado:rw[4]&&rw[4].trim()&&rw[4].trim().toLowerCase()!==''
-      });
+      var rw=rows2[i];if(!rw[1]||!rw[1].trim())continue;
+      var fe=paf(rw[13]),p1=pm(rw[5]),p2=pm(rw[7]),p3=pm(rw[9]),p4=pm(rw[11]);
+      var tot=(p1||0)+(p2||0)+(p3||0)+(p4||0);
+      adm.push({nombre:rw[1]?rw[1].trim():'',email:rw[2]?rw[2].trim():'',canal:rw[3]?rw[3].trim():'',reembolso:rw[4]?rw[4].trim():'',pago1:p1,fechaP1:rw[6]?rw[6].trim():'',pago2:p2,fechaP2:rw[8]?rw[8].trim():'',pago3:p3,fechaP3:rw[10]?rw[10].trim():'',pago4:p4,fechaP4:rw[12]?rw[12].trim():'',fechaAgenda:fe,hora:rw[14]?rw[14].trim():'',estado:rw[15]?rw[15].trim():'',totalPagado:tot,esCuotas:p2!==null||p3!==null||p4!==null,reembolsado:!!(rw[4]&&rw[4].trim())});
     }
     
-    renderTab1(ses);
-    renderTab2(adm);
-    renderTab3(ses,adm);
-    
+    renderT1(ses);renderT2(adm);renderT3(ses,adm);
     var nd=new Date();
-    document.getElementById('lu').textContent='Actualizado: '+nd.toLocaleTimeString('es-AR')+' · Auto cada 60s';
-  }catch(e){
-    document.getElementById('lu').textContent='Error: '+e.message;
-    console.error(e);
-  }
+    document.getElementById('lu').textContent='Actualizado: '+nd.toLocaleTimeString('es-AR')+' - Auto cada 60s';
+  }catch(e){document.getElementById('lu').textContent='Error: '+e.message;console.error(e);}
 }
 
-function renderTab1(ses){
+function pb(n){return '<span class="badge badge-pend">'+n+'</span>';}
+function gb(n){return '<span class="badge badge-comp">'+n+'</span>';}
+function planB(pp){if(!pp)return '';if(pp.toUpperCase().indexOf('FULL')>=0)return '<span class="badge badge-fp">Full Pay</span>';return '<span class="badge badge-cu">Cuotas</span>';}
+function stB(ps){if(!ps)return '';if(ps.toLowerCase().indexOf('complet')>=0)return '<span class="badge badge-comp">&#10003; Completado</span>';if(ps.toLowerCase().indexOf('active')>=0||ps.toLowerCase().indexOf('activ')>=0)return '<span class="badge badge-pend">&#9203; Activo</span>';return '';}
+
+function renderT1(ses){
   var c=document.getElementById('t1');
   if(!ses.length){c.innerHTML='<div class="msg">Sin sesiones.</div>';return;}
-  
-  // KPIs
   var tot=ses.length;
-  var comprados=ses.filter(function(s){return s.montoN!==null&&s.montoN>0;});
-  var cash=comprados.reduce(function(a,s){return a+s.montoN;},0);
-  var rate=tot>0?Math.round(comprados.length/tot*100):0;
-  var fullPay=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().includes('FULL');}).length;
-  var cuotas=ses.filter(function(s){return s.planPago&&!s.planPago.toUpperCase().includes('FULL')&&s.planPago.trim()!=='';}).length;
+  var comp=ses.filter(function(s){return s.montoN!==null&&s.montoN>0;});
+  var cash=comp.reduce(function(a,s){return a+s.montoN;},0);
+  var rate=tot>0?Math.round(comp.length/tot*100):0;
+  var fpay=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')>=0;}).length;
+  var cuot=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')<0&&s.planPago.trim()!=='';}).length;
   
   var h='<div class="kgrid">';
   h+='<div class="kcard"><div class="lbl">Total Agendadas</div><div class="val b">'+tot+'</div></div>';
-  h+='<div class="kcard"><div class="lbl">Compraron</div><div class="val g">'+comprados.length+'</div><div class="sub">de '+tot+' sesiones</div></div>';
+  h+='<div class="kcard"><div class="lbl">Compraron</div><div class="val g">'+comp.length+'</div><div class="sub">de '+tot+' sesiones</div></div>';
   h+='<div class="kcard"><div class="lbl">Cash 1ra Llamada</div><div class="val g">'+fm(cash)+'</div></div>';
   h+='<div class="kcard"><div class="lbl">Tasa de Cierre</div><div class="val y">'+rate+'%</div><div class="prog-bar"><div class="prog-fill" style="width:'+rate+'%"></div></div></div>';
-  h+='<div class="kcard"><div class="lbl">Full Pay</div><div class="val p">'+fullPay+'</div></div>';
-  h+='<div class="kcard"><div class="lbl">En Cuotas</div><div class="val b">'+cuotas+'</div></div>';
+  h+='<div class="kcard"><div class="lbl">Full Pay</div><div class="val p">'+fpay+'</div></div>';
+  h+='<div class="kcard"><div class="lbl">En Cuotas</div><div class="val b">'+cuot+'</div></div>';
   h+='</div>';
   
-  // Group by date
   var g={},o=[];
   for(var s of ses){if(!g[s.fecha]){g[s.fecha]=[];o.push(s.fecha);}g[s.fecha].push(s);}
   
   for(var fe of o){
-    var ls=g[fe];var lab=dlLong(fe);var hoy=it(fe);
-    var comp=ls.filter(function(x){return x.montoN!==null&&x.montoN>0;});
-    var dCash=comp.reduce(function(a,x){return a+x.montoN;},0);
+    var ls=g[fe];var lab=dl(fe);var hoy=it(fe);
+    var dcomp=ls.filter(function(x){return x.montoN!==null&&x.montoN>0;});
+    var dcash=dcomp.reduce(function(a,x){return a+x.montoN;},0);
     h+='<div class="dsec"><div class="dhdr"><h2>'+lab+'</h2>';
     if(hoy)h+='<span class="hoy">HOY</span>';
-    h+='<span class="dcnt">'+comp.length+'/'+ls.length+' compraron &middot; '+fm(dCash)+'</span></div>';
-    h+='<table class="tbl"><thead><tr><th>#</th><th>Nombre</th><th>Monto 1ra Llamada</th><th>Plan de Pago</th><th>Status</th></tr></thead><tbody>';
+    h+='<span class="dcnt">'+dcomp.length+'/'+ls.length+' compraron &middot; '+fm(dcash)+'</span></div>';
+    h+='<table class="tbl"><thead><tr><th>#</th><th>Nombre</th><th>1ra Llamada</th><th>Plan</th><th>Status</th></tr></thead><tbody>';
     ls.forEach(function(s,i){
-      var mCls='emp',mDp='&#8212;';
-      if(s.montoN!==null&&s.montoN>0){mCls='paid';mDp=fm(s.montoN);}
-      else if(s.monto&&s.monto!==''){mCls='zero';mDp=s.monto;}
-      
-      var planBadge='';
-      if(s.planPago){
-        if(s.planPago.toUpperCase().includes('FULL'))planBadge='<span class="badge badge-fp">Full Pay</span>';
-        else planBadge='<span class="badge badge-cu">Cuotas</span>';
-      }
-      
-      var stBadge='';
-      if(s.planStatus){
-        if(s.planStatus.toLowerCase().includes('complet'))stBadge='<span class="badge badge-comp">Completado</span>';
-        else if(s.planStatus.toLowerCase().includes('active'))stBadge='<span class="badge badge-pend">Activo</span>';
-        else stBadge='<span class="badge badge-sa" style="font-size:.6rem">'+s.planStatus.substring(0,15)+'</span>';
-      }
-      
-      h+='<tr><td style="color:#475569">'+(i+1)+'</td>';
-      h+='<td style="font-weight:500">'+(s.nombre||'-')+'</td>';
-      h+='<td class="'+mCls+'">'+mDp+'</td>';
-      h+='<td>'+planBadge+'</td>';
-      h+='<td>'+stBadge+'</td></tr>';
+      var mCl='emp',mDp='&#8212;';
+      if(s.montoN!==null&&s.montoN>0){mCl='paid';mDp=fm(s.montoN);}else if(s.monto&&s.monto!==''){mCl='zero';mDp=s.monto;}
+      h+='<tr><td style="color:#475569">'+(i+1)+'</td><td style="font-weight:500">'+(s.nombre||'-')+'</td><td class="'+mCl+'">'+mDp+'</td><td>'+planB(s.planPago)+'</td><td>'+stB(s.planStatus)+'</td></tr>';
     });
     h+='</tbody></table></div>';
   }
   c.innerHTML=h;
 }
 
-function renderTab2(adm){
+function renderT2(adm){
   var c=document.getElementById('t2');
   if(!adm.length){c.innerHTML='<div class="msg">Sin datos de admision.</div>';return;}
-  
-  var agendados=adm.filter(function(a){return a.fechaAgenda;});
-  var sinAgendar=adm.filter(function(a){return !a.fechaAgenda;});
-  var reembolsados=adm.filter(function(a){return a.reembolsado;});
+  var ag=adm.filter(function(a){return a.fechaAgenda;});
+  var sa=adm.filter(function(a){return !a.fechaAgenda;});
+  var re=adm.filter(function(a){return a.reembolsado;});
   var totalAdm=adm.length;
-  var totalPagos=adm.reduce(function(a,x){return a+(x.totalPagado||0);},0);
-  var cuotas=adm.filter(function(a){return a.esCuotas;}).length;
-  var ticketTotal=3000;var downPay=500;
+  var dpTot=adm.reduce(function(a,x){return a+(x.pago1||0);},0);
+  var cuot=adm.filter(function(a){return a.esCuotas;}).length;
   
-  // KPIs
   var h='<div class="kgrid">';
-  h+='<div class="kcard"><div class="lbl">Total Admitidos</div><div class="val b">'+totalAdm+'</div></div>';
-  h+='<div class="kcard"><div class="lbl">Agendados</div><div class="val g">'+agendados.length+'</div><div class="sub">'+sinAgendar.length+' sin agendar</div></div>';
-  h+='<div class="kcard"><div class="lbl">Down Payments</div><div class="val g">'+fm(totalPagos)+'</div><div class="sub">$500 c/u cobrado</div></div>';
-  h+='<div class="kcard"><div class="lbl">Saldo Total x Cobrar</div><div class="val y">'+fm(totalAdm*2500)+'</div><div class="sub">$2,500 por cliente</div></div>';
-  h+='<div class="kcard"><div class="lbl">En Cuotas</div><div class="val p">'+cuotas+'</div></div>';
-  if(reembolsados.length>0)h+='<div class="kcard"><div class="lbl">Reembolsados</div><div class="val r">'+reembolsados.length+'</div></div>';
+  h+='<div class="kcard"><div class="lbl">Total Admitidos</div><div class="val b">'+totalAdm+'</div><div class="sub">pagaron $500 cita</div></div>';
+  h+='<div class="kcard"><div class="lbl">Agendados</div><div class="val g">'+ag.length+'</div><div class="sub">'+sa.length+' sin agendar</div></div>';
+  h+='<div class="kcard"><div class="lbl">Down Payments</div><div class="val g">'+fm(dpTot)+'</div><div class="sub">$500 c/u</div></div>';
+  h+='<div class="kcard"><div class="lbl">Saldo x Cobrar</div><div class="val y">'+fm(totalAdm*2500)+'</div><div class="sub">$2,500 por cliente</div></div>';
+  h+='<div class="kcard"><div class="lbl">En Cuotas</div><div class="val p">'+cuot+'</div></div>';
+  if(re.length>0)h+='<div class="kcard"><div class="lbl">Reembolsados</div><div class="val r">'+re.length+'</div></div>';
   h+='</div>';
   
-  // Group agendados by date
-  if(agendados.length>0){
-    h+='<div class="section-title">&#128198; Agendados por fecha</div>';
+  if(ag.length>0){
+    h+='<div class="stitle">&#128198; Agendados por fecha</div>';
     var g={},o=[];
-    for(var a of agendados){if(!g[a.fechaAgenda]){g[a.fechaAgenda]=[];o.push(a.fechaAgenda);}g[a.fechaAgenda].push(a);}
-    
+    for(var a of ag){if(!g[a.fechaAgenda]){g[a.fechaAgenda]=[];o.push(a.fechaAgenda);}g[a.fechaAgenda].push(a);}
     for(var fe of o){
-      var ls=g[fe];var lab=dlLong(fe);var hoy=it(fe);
+      var ls=g[fe];var lab=dl(fe);var hoy=it(fe);
       h+='<div class="dsec"><div class="dhdr"><h2>'+lab+'</h2>';
       if(hoy)h+='<span class="hoy">HOY</span>';
       h+='<span class="dcnt">'+ls.length+' agendados</span></div>';
-      h+='<table class="tbl"><thead><tr><th>#</th><th>Nombre / Usuario</th><th>Hora</th><th>Canal</th><th>Down Pay</th><th>Pago 2</th><th>Pago 3</th><th>Estado</th></tr></thead><tbody>';
+      h+='<table class="tbl"><thead><tr><th>#</th><th>Nombre/Usuario</th><th>Hora</th><th>Canal</th><th>Down Pay</th><th>Pago 2</th><th>Pago 3</th><th>Estado</th></tr></thead><tbody>';
       ls.forEach(function(a,i){
-        var estBadge='';
         var est=a.estado||'';
-        if(est.includes('Pendiente'))estBadge='<span class="badge badge-pend">&#9203; Pendiente</span>';
-        else if(est.includes('Sin agendar'))estBadge='<span class="badge badge-sa">&#128203; Sin agendar</span>';
-        else estBadge='<span class="badge badge-comp">'+est.substring(0,12)+'</span>';
-        
+        var eb=est.indexOf('Pendiente')>=0?pb('&#9203; Pendiente'):est.indexOf('Sin agendar')>=0?'<span class="badge badge-sa">Sin agendar</span>':gb(est.substring(0,10));
         var reimb=a.reembolsado?'<span class="badge badge-reimb">REIMB</span>':'';
-        
-        h+='<tr><td style="color:#475569">'+(i+1)+'</td>';
-        h+='<td style="font-weight:500">'+a.nombre+(reimb?' '+reimb:'')+'</td>';
-        h+='<td style="color:#94a3b8">'+a.hora+'</td>';
-        h+='<td><span class="badge" style="background:#1e3a5f;color:#60a5fa">'+a.canal+'</span></td>';
-        h+='<td class="paid">'+fm(a.pago1)+'</td>';
-        h+='<td class="'+(a.pago2?'paid':'emp')+'">'+fm(a.pago2)+'</td>';
-        h+='<td class="'+(a.pago3?'paid':'emp')+'">'+fm(a.pago3)+'</td>';
-        h+='<td>'+estBadge+'</td></tr>';
+        h+='<tr><td style="color:#475569">'+(i+1)+'</td><td style="font-weight:500">'+a.nombre+(reimb?' '+reimb:'')+'</td><td style="color:#94a3b8">'+a.hora+'</td><td><span class="badge badge-canal">'+a.canal+'</span></td><td class="paid">'+fm(a.pago1)+'</td><td class="'+(a.pago2?'paid':'emp')+'">'+fm(a.pago2)+'</td><td class="'+(a.pago3?'paid':'emp')+'">'+fm(a.pago3)+'</td><td>'+eb+'</td></tr>';
       });
       h+='</tbody></table></div>';
     }
   }
   
-  // Sin agendar
-  if(sinAgendar.length>0){
-    h+='<div class="section-title" style="margin-top:24px">&#128203; Sin agendar ('+sinAgendar.length+')</div>';
-    h+='<div class="dsec"><table class="tbl"><thead><tr><th>#</th><th>Nombre / Usuario</th><th>Email</th><th>Canal</th><th>Down Pay</th><th>Fecha Pago</th></tr></thead><tbody>';
-    sinAgendar.forEach(function(a,i){
-      h+='<tr><td style="color:#475569">'+(i+1)+'</td>';
-      h+='<td style="font-weight:500">'+a.nombre+'</td>';
-      h+='<td style="color:#64748b;font-size:.75rem">'+a.email+'</td>';
-      h+='<td><span class="badge" style="background:#1e3a5f;color:#60a5fa">'+a.canal+'</span></td>';
-      h+='<td class="paid">'+fm(a.pago1)+'</td>';
-      h+='<td style="color:#64748b">'+a.fechaP1+'</td></tr>';
+  if(sa.length>0){
+    h+='<div class="stitle" style="margin-top:20px">&#128203; Sin agendar ('+sa.length+')</div>';
+    h+='<div class="dsec"><table class="tbl"><thead><tr><th>#</th><th>Nombre/Usuario</th><th>Email</th><th>Canal</th><th>Down Pay</th><th>Fecha Pago</th></tr></thead><tbody>';
+    sa.forEach(function(a,i){
+      h+='<tr><td style="color:#475569">'+(i+1)+'</td><td style="font-weight:500">'+a.nombre+'</td><td style="color:#64748b;font-size:.75rem">'+a.email+'</td><td><span class="badge badge-canal">'+a.canal+'</span></td><td class="paid">'+fm(a.pago1)+'</td><td style="color:#64748b">'+a.fechaP1+'</td></tr>';
     });
     h+='</tbody></table></div>';
   }
-  
   c.innerHTML=h;
 }
 
-function renderTab3(ses,adm){
+function renderT3(ses,adm){
   var c=document.getElementById('t3');
   var tot=ses.length;
   var comp=ses.filter(function(s){return s.montoN!==null&&s.montoN>0;});
   var cash=comp.reduce(function(a,s){return a+s.montoN;},0);
   var rate=tot>0?Math.round(comp.length/tot*100):0;
-  var fullPay=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().includes('FULL');});
-  var cuotas=ses.filter(function(s){return s.planPago&&!s.planPago.toUpperCase().includes('FULL')&&s.planPago.trim()!=='';});
-  var totalCollected=ses.reduce(function(a,s){return a+(s.totalCollected||0);},0);
-  var totalRemaining=ses.reduce(function(a,s){return a+(s.remaining||0);},0);
-  
-  var admTotal=adm.length;
-  var admAgendados=adm.filter(function(a){return a.fechaAgenda;}).length;
-  var admSinAgendar=adm.filter(function(a){return !a.fechaAgenda;}).length;
-  var downPays=adm.reduce(function(a,x){return a+(x.pago1||0);},0);
-  var saldoPorCobrar=admTotal*2500;
+  var fp=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')>=0;});
+  var cu=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')<0&&s.planPago.trim()!=='';});
+  var tc=ses.reduce(function(a,s){return a+(s.totalCollected||0);},0);
+  var tr=ses.reduce(function(a,s){return a+(s.remaining||0);},0);
+  var admTot=adm.length;
+  var admAg=adm.filter(function(a){return a.fechaAgenda;}).length;
+  var admSa=adm.filter(function(a){return !a.fechaAgenda;}).length;
+  var dp=adm.reduce(function(a,x){return a+(x.pago1||0);},0);
   
   var h='<div class="kgrid">';
-  h+='<div class="kcard" style="border-color:#4ade8066"><div class="lbl">&#127775; Compraron en 1ra Llamada</div><div class="val g">'+comp.length+'/'+tot+'</div><div class="sub">'+rate+'% tasa de cierre</div></div>';
-  h+='<div class="kcard" style="border-color:#4ade8066"><div class="lbl">&#128176; Cash Recaudado</div><div class="val g">'+fm(cash)+'</div><div class="sub">1ra llamada</div></div>';
-  h+='<div class="kcard"><div class="lbl">&#128196; Total Cobrado</div><div class="val g">'+fm(totalCollected)+'</div><div class="sub">Incluyendo cuotas</div></div>';
-  h+='<div class="kcard"><div class="lbl">&#128337; Saldo Pendiente</div><div class="val y">'+fm(totalRemaining)+'</div><div class="sub">Por cobrar (clientes)</div></div>';
+  h+='<div class="kcard" style="border-color:#4ade8066"><div class="lbl">&#9989; Compraron</div><div class="val g">'+comp.length+'/'+tot+'</div><div class="sub">'+rate+'% tasa cierre</div><div class="prog-bar"><div class="prog-fill" style="width:'+rate+'%"></div></div></div>';
+  h+='<div class="kcard" style="border-color:#4ade8066"><div class="lbl">&#128176; Cash 1ra Llamada</div><div class="val g">'+fm(cash)+'</div></div>';
+  h+='<div class="kcard"><div class="lbl">&#128196; Total Cobrado</div><div class="val g">'+fm(tc)+'</div><div class="sub">Incl. cuotas</div></div>';
+  h+='<div class="kcard"><div class="lbl">&#128337; Saldo Pendiente</div><div class="val y">'+fm(tr)+'</div><div class="sub">Por cobrar</div></div>';
+  h+='<div class="kcard" style="border-color:#c084fc66"><div class="lbl">&#9989; Full Pay</div><div class="val p">'+fp.length+'</div></div>';
+  h+='<div class="kcard" style="border-color:#60a5fa66"><div class="lbl">&#128200; En Cuotas</div><div class="val b">'+cu.length+'</div></div>';
+  h+='<div class="kcard" style="border-color:#fbbf2466"><div class="lbl">&#128197; Admitidos</div><div class="val y">'+admTot+'</div><div class="sub">pagaron $500 cita</div></div>';
+  h+='<div class="kcard" style="border-color:#4ade8066"><div class="lbl">&#128203; Agendados</div><div class="val g">'+admAg+'</div><div class="sub">'+admSa+' sin agendar</div></div>';
+  h+='<div class="kcard"><div class="lbl">&#128178; Down Payments</div><div class="val g">'+fm(dp)+'</div></div>';
+  h+='<div class="kcard"><div class="lbl">&#128181; Saldo Admision</div><div class="val r">'+fm(admTot*2500)+'</div><div class="sub">$2,500 x cliente</div></div>';
   h+='</div>';
   
-  h+='<div class="kgrid" style="margin-top:0">';
-  h+='<div class="kcard" style="border-color:#c084fc66"><div class="lbl">&#9989; Full Pay</div><div class="val p">'+fullPay.length+'</div><div class="sub">pago completo</div></div>';
-  h+='<div class="kcard" style="border-color:#60a5fa66"><div class="lbl">&#128200; En Cuotas</div><div class="val b">'+cuotas.length+'</div><div class="sub">plan de pagos</div></div>';
-  h+='<div class="kcard" style="border-color:#fbbf2466"><div class="lbl">&#128197; Admitidos Totales</div><div class="val y">'+admTotal+'</div><div class="sub">pagaron $500 cita</div></div>';
-  h+='<div class="kcard" style="border-color:#4ade8066"><div class="lbl">&#128203; Agendados</div><div class="val g">'+admAgendados+'</div><div class="sub">'+admSinAgendar+' sin agendar</div></div>';
-  h+='<div class="kcard"><div class="lbl">&#128178; Down Payments</div><div class="val g">'+fm(downPays)+'</div><div class="sub">$500 c/u</div></div>';
-  h+='<div class="kcard"><div class="lbl">&#128181; Saldo por Cobrar</div><div class="val r">'+fm(saldoPorCobrar)+'</div><div class="sub">$2,500 por admitido</div></div>';
-  h+='</div>';
-  
-  // Who bought - breakdown
   if(comp.length>0){
-    h+='<div class="section-title" style="margin-top:24px">&#127775; Quienes compraron en 1ra llamada</div>';
-    h+='<div class="dsec"><table class="tbl"><thead><tr><th>#</th><th>Nombre</th><th>Monto 1ra Llamada</th><th>Plan</th><th>Total Cobrado</th><th>Saldo</th><th>Status</th></tr></thead><tbody>';
+    h+='<div class="stitle">&#127775; Quienes compraron en 1ra llamada</div>';
+    h+='<div class="dsec"><table class="tbl"><thead><tr><th>#</th><th>Nombre</th><th>1ra Llamada</th><th>Plan</th><th>Total Cobrado</th><th>Saldo</th><th>Status</th></tr></thead><tbody>';
     comp.forEach(function(s,i){
-      var plan='';
-      if(s.planPago){
-        if(s.planPago.toUpperCase().includes('FULL'))plan='<span class="badge badge-fp">Full Pay</span>';
-        else plan='<span class="badge badge-cu">Cuotas</span>';
-      }
-      var st='';
-      if(s.planStatus){
-        if(s.planStatus.toLowerCase().includes('complet'))st='<span class="badge badge-comp">&#10003; Completado</span>';
-        else st='<span class="badge badge-pend">&#9203; Activo</span>';
-      }
-      h+='<tr><td style="color:#475569">'+(i+1)+'</td>';
-      h+='<td style="font-weight:600;color:#f1f5f9">'+s.nombre+'</td>';
-      h+='<td class="paid">'+fm(s.montoN)+'</td>';
-      h+='<td>'+plan+'</td>';
-      h+='<td class="paid">'+fm(s.totalCollected)+'</td>';
-      h+='<td class="'+(s.remaining&&s.remaining>0?'pend':'paid')+'">'+fm(s.remaining)+'</td>';
-      h+='<td>'+st+'</td></tr>';
+      h+='<tr><td style="color:#475569">'+(i+1)+'</td><td style="font-weight:600;color:#f1f5f9">'+s.nombre+'</td><td class="paid">'+fm(s.montoN)+'</td><td>'+planB(s.planPago)+'</td><td class="paid">'+fm(s.totalCollected)+'</td><td class="'+(s.remaining&&s.remaining>0?'pend':'paid')+'">'+fm(s.remaining)+'</td><td>'+stB(s.planStatus)+'</td></tr>';
     });
     h+='</tbody></table></div>';
   }
-  
   c.innerHTML=h;
 }
 
-run();
-setInterval(run,60000);
+run();setInterval(run,60000);
+<script>
+var SH1='https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
+var SH2='https://docs.google.com/spreadsheets/d/1BfB80DmKnR2XKu8gPB2tc-z-xH9CvtgH60cU4SjfQgU/gviz/tq?tqx=out:csv&sheet=PAGOS';
+var MES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,octubre:10,noviembre:11,diciembre:12};
+function showTab(id,el){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById(id).classList.add('active');el.classList.add('active');}
+function csv(t){var R=[],rw=[],c='',q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(ch==='"'){if(q&&t[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){rw.push(c);c='';}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&t[i+1]==='\n')i++;rw.push(c);c='';R.push(rw);rw=[];}else c+=ch;}if(rw.length){rw.push(c);R.push(rw);}return R;}
+function pm(v){if(!v||!v.trim()||v.trim()==='?')return null;var s=v.replace(/\$/g,'').trim().replace(/\./g,'').replace(',','.');var n=parseFloat(s);return isNaN(n)?null:n;}
+function fm(n){if(n===null||n===undefined)return '&#8212;';if(n===0)return '$0';return '$'+Math.round(n).toLocaleString('es-AR');}
+function pf(col1){if(!col1)return null;var m=col1.match(/,\s*(\d+)\s+de\s+(\w+)/i);if(!m)return null;var dd=+m[1],mes=MES[m[2].toLowerCase()];if(!mes)return null;return mes+'/'+dd+'/2026';}
+function dl(fe){var p=fe.split('/');if(p.length!==3)return fe;var d=new Date(+p[2],+p[0]-1,+p[1]);var dn=['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];var mn=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sep','Oct','Nov','Dic'];return dn[d.getDay()]+' '+d.getDate()+' '+mn[+p[0]-1]+' '+p[2];}
+function it(fe){var p=fe.split('/');if(p.length!==3)return false;var n=new Date();return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();}
+function paf(s){if(!s||!s.trim())return '';var m=s.match(/(\d+)[\s\/](\w+)[\s\/](\d{4})/);if(!m)return '';var dd=+m[1],mesStr=m[2].toLowerCase(),yr=+m[3];var mNum=MES[mesStr]||(isNaN(+mesStr)?0:+mesStr);if(!mNum)return '';return mNum+'/'+dd+'/'+yr;}
+function planB(pp){if(!pp)return '';if(pp.toUpperCase().indexOf('FULL')>=0)return '<span class=\"badge badge-fp\">Full Pay</span>';return '<span class=\"badge badge-cu\">Cuotas</span>';}
+function stB(ps){if(!ps)return '';if(ps.toLowerCase().indexOf('complet')>=0)return '<span class=\"badge badge-comp\">&#10003; Completado</span>';if(ps.toLowerCase().indexOf('activ')>=0)return '<span class=\"badge badge-pend\">&#9203; Activo</span>';return '';}
+
+async function run(){
+  document.getElementById('lu').textContent='Actualizando...';
+  try{
+    var r1=await fetch(SH1+'&t='+Date.now()).then(function(r){return r.text();});
+    var r2=await fetch(SH2+'&t='+Date.now()).then(function(r){return r.text();});
+    var rows1=csv(r1),rows2=csv(r2);
+    var ses=[];
+    for(var i=1;i<rows1.length;i++){var rw=rows1[i];var fe=pf(rw[1]);if(!fe)continue;ses.push({nombre:rw[2]?rw[2].trim():'',fecha:fe,monto:rw[11]?rw[11].trim():'',montoN:pm(rw[11]),planStatus:rw[15]?rw[15].trim():'',totalCollected:pm(rw[16]),remaining:pm(rw[17]),planPago:rw[19]?rw[19].trim():'',payMethod:rw[13]?rw[13].trim():''});}
+    var adm=[];
+    for(var i=1;i<rows2.length;i++){var rw=rows2[i];if(!rw[1]||!rw[1].trim())continue;var fe=paf(rw[13]),p1=pm(rw[5]),p2=pm(rw[7]),p3=pm(rw[9]),p4=pm(rw[11]),tot=(p1||0)+(p2||0)+(p3||0)+(p4||0);adm.push({nombre:rw[1]?rw[1].trim():'',email:rw[2]?rw[2].trim():'',canal:rw[3]?rw[3].trim():'',reembolso:rw[4]?rw[4].trim():'',pago1:p1,fechaP1:rw[6]?rw[6].trim():'',pago2:p2,fechaP2:rw[8]?rw[8].trim():'',pago3:p3,pago4:p4,fechaAgenda:fe,hora:rw[14]?rw[14].trim():'',estado:rw[15]?rw[15].trim():'',totalPagado:tot,esCuotas:p2!==null||p3!==null||p4!==null,reembolsado:!!(rw[4]&&rw[4].trim())});}
+    renderT1(ses);renderT2(adm);renderT3(ses,adm);
+    var nd=new Date();document.getElementById('lu').textContent='Actualizado: '+nd.toLocaleTimeString('es-AR')+' - Auto 60s';
+  }catch(e){document.getElementById('lu').textContent='Error: '+e.message;console.error(e);}
+}
+
+function renderT1(ses){
+  var c=document.getElementById('t1');if(!ses.length){c.innerHTML='<div class=\"msg\">Sin sesiones.</div>';return;}
+  var tot=ses.length,comp=ses.filter(function(s){return s.montoN!==null&&s.montoN>0;}),cash=comp.reduce(function(a,s){return a+s.montoN;},0),rate=tot>0?Math.round(comp.length/tot*100):0;
+  var fpay=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')>=0;}).length;
+  var cuot=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')<0&&s.planPago.trim()!=='';}).length;
+  var h='<div class=\"kgrid\">';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Total Agendadas</div><div class=\"val b\">'+tot+'</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Compraron</div><div class=\"val g\">'+comp.length+'</div><div class=\"sub\">de '+tot+' sesiones</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Cash 1ra Llamada</div><div class=\"val g\">'+fm(cash)+'</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Tasa de Cierre</div><div class=\"val y\">'+rate+'%</div><div class=\"prog-bar\"><div class=\"prog-fill\" style=\"width:'+rate+'%\"></div></div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Full Pay</div><div class=\"val p\">'+fpay+'</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">En Cuotas</div><div class=\"val b\">'+cuot+'</div></div></div>';
+  var g={},o=[];for(var s of ses){if(!g[s.fecha]){g[s.fecha]=[];o.push(s.fecha);}g[s.fecha].push(s);}
+  for(var fe of o){var ls=g[fe],lab=dl(fe),hoy=it(fe),dcomp=ls.filter(function(x){return x.montoN!==null&&x.montoN>0;}),dcash=dcomp.reduce(function(a,x){return a+x.montoN;},0);
+    h+='<div class=\"dsec\"><div class=\"dhdr\"><h2>'+lab+'</h2>'+(hoy?'<span class=\"hoy\">HOY</span>':'')+'<span class=\"dcnt\">'+dcomp.length+'/'+ls.length+' compraron &middot; '+fm(dcash)+'</span></div>';
+    h+='<table class=\"tbl\"><thead><tr><th>#</th><th>Nombre</th><th>1ra Llamada</th><th>Plan</th><th>Status</th></tr></thead><tbody>';
+    ls.forEach(function(s,i){var mCl='emp',mDp='&#8212;';if(s.montoN!==null&&s.montoN>0){mCl='paid';mDp=fm(s.montoN);}else if(s.monto&&s.monto!==''){mCl='zero';mDp=s.monto;}h+='<tr><td style=\"color:#475569\">'+(i+1)+'</td><td style=\"font-weight:500\">'+(s.nombre||'-')+'</td><td class=\"'+mCl+'\">'+mDp+'</td><td>'+planB(s.planPago)+'</td><td>'+stB(s.planStatus)+'</td></tr>';});
+    h+='</tbody></table></div>';
+  }
+  c.innerHTML=h;
+}
+
+function renderT2(adm){
+  var c=document.getElementById('t2');if(!adm.length){c.innerHTML='<div class=\"msg\">Sin datos.</div>';return;}
+  var ag=adm.filter(function(a){return a.fechaAgenda;}),sa=adm.filter(function(a){return !a.fechaAgenda;}),re=adm.filter(function(a){return a.reembolsado;});
+  var totalAdm=adm.length,dpTot=adm.reduce(function(a,x){return a+(x.pago1||0);},0),cuot=adm.filter(function(a){return a.esCuotas;}).length;
+  var h='<div class=\"kgrid\">';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Total Admitidos</div><div class=\"val b\">'+totalAdm+'</div><div class=\"sub\">pagaron $500 cita</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Agendados</div><div class=\"val g\">'+ag.length+'</div><div class=\"sub\">'+sa.length+' sin agendar</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Down Payments</div><div class=\"val g\">'+fm(dpTot)+'</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">Saldo x Cobrar</div><div class=\"val y\">'+fm(totalAdm*2500)+'</div><div class=\"sub\">$2,500 por cliente</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">En Cuotas</div><div class=\"val p\">'+cuot+'</div></div>';
+  if(re.length>0)h+='<div class=\"kcard\"><div class=\"lbl\">Reembolsados</div><div class=\"val r\">'+re.length+'</div></div>';
+  h+='</div>';
+  if(ag.length>0){
+    h+='<div class=\"stitle\">&#128198; Agendados por fecha</div>';
+    var g={},o=[];for(var a of ag){if(!g[a.fechaAgenda]){g[a.fechaAgenda]=[];o.push(a.fechaAgenda);}g[a.fechaAgenda].push(a);}
+    for(var fe of o){var ls=g[fe],lab=dl(fe),hoy=it(fe);
+      h+='<div class=\"dsec\"><div class=\"dhdr\"><h2>'+lab+'</h2>'+(hoy?'<span class=\"hoy\">HOY</span>':'')+'<span class=\"dcnt\">'+ls.length+' agendados</span></div>';
+      h+='<table class=\"tbl\"><thead><tr><th>#</th><th>Nombre/Usuario</th><th>Hora</th><th>Canal</th><th>Down Pay</th><th>Pago 2</th><th>Pago 3</th><th>Estado</th></tr></thead><tbody>';
+      ls.forEach(function(a,i){var est=a.estado||'',eb=est.indexOf('Pendiente')>=0?'<span class=\"badge badge-pend\">&#9203; Pendiente</span>':est.indexOf('Sin agendar')>=0?'<span class=\"badge badge-sa\">Sin agendar</span>':'<span class=\"badge badge-comp\">'+est.substring(0,10)+'</span>';var reimb=a.reembolsado?'<span class=\"badge badge-reimb\">REIMB</span>':'';h+='<tr><td style=\"color:#475569\">'+(i+1)+'</td><td style=\"font-weight:500\">'+a.nombre+(reimb?' '+reimb:'')+'</td><td style=\"color:#94a3b8\">'+a.hora+'</td><td><span class=\"badge badge-canal\">'+a.canal+'</span></td><td class=\"paid\">'+fm(a.pago1)+'</td><td class=\"'+(a.pago2?'paid':'emp')+'\">'+fm(a.pago2)+'</td><td class=\"'+(a.pago3?'paid':'emp')+'\">'+fm(a.pago3)+'</td><td>'+eb+'</td></tr>';});
+      h+='</tbody></table></div>';
+    }
+  }
+  if(sa.length>0){h+='<div class=\"stitle\" style=\"margin-top:20px\">&#128203; Sin agendar ('+sa.length+')</div><div class=\"dsec\"><table class=\"tbl\"><thead><tr><th>#</th><th>Nombre</th><th>Email</th><th>Canal</th><th>Down Pay</th><th>Fecha Pago</th></tr></thead><tbody>';sa.forEach(function(a,i){h+='<tr><td style=\"color:#475569\">'+(i+1)+'</td><td style=\"font-weight:500\">'+a.nombre+'</td><td style=\"color:#64748b;font-size:.75rem\">'+a.email+'</td><td><span class=\"badge badge-canal\">'+a.canal+'</span></td><td class=\"paid\">'+fm(a.pago1)+'</td><td style=\"color:#64748b\">'+a.fechaP1+'</td></tr>';});h+='</tbody></table></div>';}
+  c.innerHTML=h;
+}
+
+function renderT3(ses,adm){
+  var c=document.getElementById('t3');
+  var tot=ses.length,comp=ses.filter(function(s){return s.montoN!==null&&s.montoN>0;}),cash=comp.reduce(function(a,s){return a+s.montoN;},0),rate=tot>0?Math.round(comp.length/tot*100):0;
+  var fp=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')>=0;});
+  var cu=ses.filter(function(s){return s.planPago&&s.planPago.toUpperCase().indexOf('FULL')<0&&s.planPago.trim()!=='';});
+  var tc=ses.reduce(function(a,s){return a+(s.totalCollected||0);},0),tr=ses.reduce(function(a,s){return a+(s.remaining||0);},0);
+  var admTot=adm.length,admAg=adm.filter(function(a){return a.fechaAgenda;}).length,admSa=adm.filter(function(a){return !a.fechaAgenda;}).length;
+  var dp=adm.reduce(function(a,x){return a+(x.pago1||0);},0);
+  var h='<div class=\"kgrid\">';
+  h+='<div class=\"kcard\" style=\"border-color:#4ade8066\"><div class=\"lbl\">&#9989; Compraron</div><div class=\"val g\">'+comp.length+'/'+tot+'</div><div class=\"sub\">'+rate+'% tasa cierre</div><div class=\"prog-bar\"><div class=\"prog-fill\" style=\"width:'+rate+'%\"></div></div></div>';
+  h+='<div class=\"kcard\" style=\"border-color:#4ade8066\"><div class=\"lbl\">&#128176; Cash 1ra Llamada</div><div class=\"val g\">'+fm(cash)+'</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">&#128196; Total Cobrado</div><div class=\"val g\">'+fm(tc)+'</div><div class=\"sub\">Incl. cuotas</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">&#128337; Saldo Pendiente</div><div class=\"val y\">'+fm(tr)+'</div></div>';
+  h+='<div class=\"kcard\" style=\"border-color:#c084fc66\"><div class=\"lbl\">&#9989; Full Pay</div><div class=\"val p\">'+fp.length+'</div></div>';
+  h+='<div class=\"kcard\" style=\"border-color:#60a5fa66\"><div class=\"lbl\">&#128200; En Cuotas</div><div class=\"val b\">'+cu.length+'</div></div>';
+  h+='<div class=\"kcard\" style=\"border-color:#fbbf2466\"><div class=\"lbl\">&#128197; Admitidos</div><div class=\"val y\">'+admTot+'</div><div class=\"sub\">pagaron $500 cita</div></div>';
+  h+='<div class=\"kcard\" style=\"border-color:#4ade8066\"><div class=\"lbl\">&#128203; Agendados</div><div class=\"val g\">'+admAg+'</div><div class=\"sub\">'+admSa+' sin agendar</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">&#128178; Down Payments</div><div class=\"val g\">'+fm(dp)+'</div></div>';
+  h+='<div class=\"kcard\"><div class=\"lbl\">&#128181; Saldo Admision</div><div class=\"val r\">'+fm(admTot*2500)+'</div><div class=\"sub\">$2,500 x cliente</div></div>';
+  h+='</div>';
+  if(comp.length>0){
+    h+='<div class=\"stitle\">&#127775; Compraron en 1ra llamada</div>';
+    h+='<div class=\"dsec\"><table class=\"tbl\"><thead><tr><th>#</th><th>Nombre</th><th>1ra Llamada</th><th>Plan</th><th>Total Cobrado</th><th>Saldo</th><th>Status</th></tr></thead><tbody>';
+    comp.forEach(function(s,i){h+='<tr><td style=\"color:#475569\">'+(i+1)+'</td><td style=\"font-weight:600;color:#f1f5f9\">'+s.nombre+'</td><td class=\"paid\">'+fm(s.montoN)+'</td><td>'+planB(s.planPago)+'</td><td class=\"paid\">'+fm(s.totalCollected)+'</td><td class=\"'+(s.remaining&&s.remaining>0?'pend':'paid')+'\">'+fm(s.remaining)+'</td><td>'+stB(s.planStatus)+'</td></tr>';});
+    h+='</tbody></table></div>';
+  }
+  c.innerHTML=h;
+}
+
+run();setInterval(run,60000);
 </script>
 </body>
 </html>
