@@ -5,201 +5,169 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Admision Marzo 2026</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
-.header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 24px 32px; border-bottom: 1px solid #334155; }
-.header h1 { font-size: 1.8rem; font-weight: 700; color: #f8fafc; }
-.header p { color: #94a3b8; margin-top: 4px; font-size: 0.9rem; }
-.refresh-bar { background: #1e293b; padding: 8px 32px; font-size: 0.8rem; color: #64748b; display: flex; justify-content: space-between; align-items: center; }
-.refresh-bar a { color: #38bdf8; text-decoration: none; cursor: pointer; }
-.refresh-bar a:hover { text-decoration: underline; }
-.container { padding: 24px 32px; }
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
-.kpi-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; text-align: center; }
-.kpi-card .label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-.kpi-card .value { font-size: 2rem; font-weight: 700; color: #f8fafc; }
-.kpi-card .value.green { color: #4ade80; }
-.kpi-card .value.blue { color: #38bdf8; }
-.kpi-card .value.yellow { color: #fbbf24; }
-.date-section { margin-bottom: 28px; }
-.date-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #1e293b; border-radius: 10px 10px 0 0; border: 1px solid #334155; border-bottom: none; }
-.date-header h2 { font-size: 1rem; font-weight: 600; color: #f1f5f9; text-transform: capitalize; }
-.hoy-badge { background: #22c55e; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
-.date-count { margin-left: auto; font-size: 0.75rem; color: #64748b; }
-.sessions-table { width: 100%; border-collapse: collapse; background: #1e293b; border: 1px solid #334155; border-radius: 0 0 10px 10px; overflow: hidden; }
-.sessions-table th { background: #0f172a; padding: 10px 14px; text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; }
-.sessions-table td { padding: 12px 14px; font-size: 0.875rem; border-top: 1px solid #1e293b; }
-.sessions-table tr:hover td { background: #0f172a; }
-.sessions-table tr td { background: #1e293b; }
-.monto.paid { color: #4ade80; font-weight: 700; }
-.monto.zero { color: #f87171; }
-.monto.empty { color: #475569; font-style: italic; }
-.loading { text-align: center; padding: 60px; color: #64748b; font-size: 1rem; }
-.error { text-align: center; padding: 60px; color: #f87171; font-size: 1rem; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.header{background:linear-gradient(135deg,#1e293b,#0f172a);padding:24px 32px;border-bottom:1px solid #334155}
+.header h1{font-size:1.8rem;font-weight:700;color:#f8fafc}
+.header p{color:#94a3b8;margin-top:4px;font-size:.9rem}
+.refresh-bar{background:#1e293b;padding:8px 32px;font-size:.8rem;color:#64748b;display:flex;justify-content:space-between;align-items:center}
+.refresh-bar a{color:#38bdf8;text-decoration:none;cursor:pointer}
+.container{padding:24px 32px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}
+.kpi-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;text-align:center}
+.kpi-card .label{font-size:.75rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.kpi-card .value{font-size:2rem;font-weight:700;color:#f8fafc}
+.kpi-card .value.green{color:#4ade80}
+.kpi-card .value.blue{color:#38bdf8}
+.kpi-card .value.yellow{color:#fbbf24}
+.date-section{margin-bottom:28px}
+.date-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#1e293b;border-radius:10px 10px 0 0;border:1px solid #334155;border-bottom:none}
+.date-header h2{font-size:1rem;font-weight:600;color:#f1f5f9;text-transform:capitalize}
+.hoy-badge{background:#22c55e;color:white;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+.date-count{margin-left:auto;font-size:.75rem;color:#64748b}
+.sessions-table{width:100%;border-collapse:collapse;background:#1e293b;border:1px solid #334155;border-radius:0 0 10px 10px;overflow:hidden}
+.sessions-table th{background:#0f172a;padding:10px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b;font-weight:600}
+.sessions-table td{padding:12px 14px;font-size:.875rem;border-top:1px solid #0f172a;background:#1e293b}
+.sessions-table tr:hover td{background:#0f172a}
+.monto.paid{color:#4ade80;font-weight:700}
+.monto.zero{color:#f87171}
+.monto.empty{color:#475569;font-style:italic}
+.loading{text-align:center;padding:60px;color:#64748b}
+.error{text-align:center;padding:60px;color:#f87171}
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>🎯 Dashboard Admision Marzo 2026</h1>
-  <p>Seguimiento de sesiones y pagos de 1ra llamada</p>
+<h1>&#127919; Dashboard Admision Marzo 2026</h1>
+<p>Seguimiento de sesiones y pagos de 1ra llamada</p>
 </div>
 <div class="refresh-bar">
-  <span id="last-update">Cargando...</span>
-  <a onclick="loadSessions()">↻ Refrescar</a>
+<span id="last-update">Cargando...</span>
+<a onclick="loadSessions()">&#8635; Refrescar</a>
 </div>
 <div class="container">
-  <div class="kpi-grid">
-    <div class="kpi-card"><div class="label">Total Agendas</div><div class="value blue" id="kpi-total">—</div></div>
-    <div class="kpi-card"><div class="label">Pagaron</div><div class="value green" id="kpi-paid">—</div></div>
-    <div class="kpi-card"><div class="label">Cash 1ra Llamada</div><div class="value green" id="kpi-cash">—</div></div>
-    <div class="kpi-card"><div class="label">Tasa de Cierre</div><div class="value yellow" id="kpi-rate">—</div></div>
-  </div>
-  <div id="admision-sessions-container"><div class="loading">⏳ Cargando sesiones desde Google Sheets...</div></div>
+<div class="kpi-grid">
+<div class="kpi-card"><div class="label">Total Agendas</div><div class="value blue" id="kpi-total">&#8212;</div></div>
+<div class="kpi-card"><div class="label">Pagaron</div><div class="value green" id="kpi-paid">&#8212;</div></div>
+<div class="kpi-card"><div class="label">Cash 1ra Llamada</div><div class="value green" id="kpi-cash">&#8212;</div></div>
+<div class="kpi-card"><div class="label">Tasa de Cierre</div><div class="value yellow" id="kpi-rate">&#8212;</div></div>
+</div>
+<div id="sessions-container"><div class="loading">Cargando sesiones...</div></div>
 </div>
 <script>
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
+var SHEET='https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
+var COL_FECHA=10,COL_MONTO=11,COL_NOMBRE=2;
 
-function parseMonto(val) {
-  if (!val || val.trim() === '' || val.trim() === '?') return null;
-  const n = parseFloat(val.replace(/[^0-9.-]/g, '').replace(',', '.'));
-  return isNaN(n) ? null : n;
+function parseCSV(t){
+  var rows=[],row=[],cur='',inQ=false;
+  for(var i=0;i<t.length;i++){
+    var c=t[i];
+    if(c==='"'){if(inQ&&t[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(c===','&&!inQ){row.push(cur);cur='';}
+    else if((c==='
+'||c==='
+')&&!inQ){if(c==='
+'&&t[i+1]==='
+')i++;row.push(cur);cur='';rows.push(row);row=[];}
+    else cur+=c;
+  }
+  if(row.length>0){row.push(cur);rows.push(row);}
+  return rows;
 }
 
-function formatMoney(n) {
-  if (n === null) return '—';
-  return '$' + n.toLocaleString('es-AR', {minimumFractionDigits: 0});
+function parseMonto(v){
+  if(!v||v.trim()===''||v.trim()==='?')return null;
+  var n=parseFloat(v.replace(/[^0-9.-]/g,'').replace(',','.'));
+  return isNaN(n)?null:n;
 }
 
-function getDayLabel(dateStr) {
-  if (!dateStr) return dateStr;
-  const parts = dateStr.split('/');
-  if (parts.length !== 3) return dateStr;
-  const d = new Date(parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
-  const days = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-  const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
+function fmtMoney(n){
+  if(n===null)return '&#8212;';
+  return '$'+n.toLocaleString('es-AR',{minimumFractionDigits:0});
 }
 
-function isToday(dateStr) {
-  if (!dateStr) return false;
-  const parts = dateStr.split('/');
-  if (parts.length !== 3) return false;
-  const now = new Date();
-  return parseInt(parts[0])-1 === now.getMonth() && parseInt(parts[1]) === now.getDate() && parseInt(parts[2]) === now.getFullYear();
+function dayLabel(s){
+  if(!s)return s;
+  var p=s.split('/');
+  if(p.length!==3)return s;
+  var d=new Date(+p[2],+p[0]-1,+p[1]);
+  var days=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
+  var months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return days[d.getDay()]+' '+d.getDate()+' '+months[d.getMonth()]+' '+p[2];
 }
 
-async function loadSessions() {
-  const container = document.getElementById('admision-sessions-container');
-  try {
-    const resp = await fetch(SHEET_URL + '&t=' + Date.now());
-    const text = await resp.text();
-    const rows = text.trim().split('\n').map(r => {
-      const cols = []; let cur = ''; let inQ = false;
-      for (let i = 0; i < r.length; i++) {
-        if (r[i] === '"') { inQ = !inQ; }
-        else if (r[i] === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-        else { cur += r[i]; }
-      }
-      cols.push(cur.trim()); return cols;
-    });
+function isToday(s){
+  if(!s)return false;
+  var p=s.split('/');
+  if(p.length!==3)return false;
+  var n=new Date();
+  return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();
+}
+
+async function loadSessions(){
+  var c=document.getElementById('sessions-container');
+  try{
+    var resp=await fetch(SHEET+'&t='+Date.now());
+    var text=await resp.text();
+    var rows=parseCSV(text);
+    if(rows.length<2){c.innerHTML='<div class="error">No hay datos en el sheet.</div>';return;}
     
-    // Find header row
-    let headerIdx = -1;
-    let colNombre = -1, colFecha = -1, colMonto = -1;
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i];
-      for (let j = 0; j < r.length; j++) {
-        const v = r[j].toLowerCase();
-        if (v.includes('nombre') || v.includes('cliente')) colNombre = j;
-        if (v.includes('fecha') && v.includes('llamada')) colFecha = j;
-        if (v.includes('monto') && v.includes('pago')) colMonto = j;
-      }
-      if (colFecha >= 0 && colMonto >= 0) { headerIdx = i; break; }
+    var sessions=[];
+    for(var i=1;i<rows.length;i++){
+      var r=rows[i];
+      var fecha=r[COL_FECHA]?r[COL_FECHA].trim():'';
+      var monto=r[COL_MONTO]?r[COL_MONTO].trim():'';
+      var nombre=r[COL_NOMBRE]?r[COL_NOMBRE].trim():'';
+      if(!fecha||!/d+/d+/d+/.test(fecha))continue;
+      sessions.push({nombre:nombre,fecha:fecha,monto:monto,montoNum:parseMonto(monto)});
     }
     
-    if (headerIdx < 0) {
-      container.innerHTML = '<div class="error">No se encontraron columnas requeridas en el sheet.</div>';
-      return;
-    }
-    
-    // Parse data rows
-    const sessions = [];
-    for (let i = headerIdx + 1; i < rows.length; i++) {
-      const r = rows[i];
-      const fecha = r[colFecha] ? r[colFecha].trim() : '';
-      const monto = colMonto >= 0 ? (r[colMonto] ? r[colMonto].trim() : '') : '';
-      const nombre = colNombre >= 0 ? (r[colNombre] ? r[colNombre].trim() : '') : '';
-      if (!fecha) continue;
-      sessions.push({ nombre, fecha, monto, montoNum: parseMonto(monto), row: i });
-    }
-    
-    // Group by date
-    const groups = {};
-    const dateOrder = [];
-    for (const s of sessions) {
-      if (!groups[s.fecha]) { groups[s.fecha] = []; dateOrder.push(s.fecha); }
+    var groups={},order=[];
+    for(var s of sessions){
+      if(!groups[s.fecha]){groups[s.fecha]=[];order.push(s.fecha);}
       groups[s.fecha].push(s);
     }
     
-    // KPIs
-    const totalSessions = sessions.length;
-    const paidSessions = sessions.filter(s => s.montoNum !== null && s.montoNum > 0);
-    const totalCash = paidSessions.reduce((sum, s) => sum + s.montoNum, 0);
-    const closeRate = totalSessions > 0 ? Math.round((paidSessions.length / totalSessions) * 100) : 0;
+    var total=sessions.length;
+    var paid=sessions.filter(function(s){return s.montoNum>0;});
+    var cash=paid.reduce(function(a,s){return a+s.montoNum;},0);
+    var rate=total>0?Math.round(paid.length/total*100):0;
     
-    document.getElementById('kpi-total').textContent = totalSessions;
-    document.getElementById('kpi-paid').textContent = paidSessions.length;
-    document.getElementById('kpi-cash').textContent = formatMoney(totalCash);
-    document.getElementById('kpi-rate').textContent = closeRate + '%';
+    document.getElementById('kpi-total').textContent=total;
+    document.getElementById('kpi-paid').textContent=paid.length;
+    document.getElementById('kpi-cash').textContent='$'+cash.toLocaleString('es-AR');
+    document.getElementById('kpi-rate').textContent=rate+'%';
     
-    // Render sections
-    let html = '';
-    for (const fecha of dateOrder) {
-      const list = groups[fecha];
-      const label = getDayLabel(fecha);
-      const today = isToday(fecha);
-      const paidCount = list.filter(s => s.montoNum !== null && s.montoNum > 0).length;
-      const fechaCash = list.filter(s => s.montoNum !== null && s.montoNum > 0).reduce((sum, s) => sum + s.montoNum, 0);
-      
-      html += '<div class="date-section">';
-      html += '<div class="date-header">';
-      html += '<h2>' + label + '</h2>';
-      if (today) html += '<span class="hoy-badge">HOY</span>';
-      html += '<span class="date-count">' + paidCount + '/' + list.length + ' pagaron · ' + formatMoney(fechaCash) + '</span>';
-      html += '</div>';
-      html += '<table class="sessions-table"><thead><tr><th>#</th><th>Nombre</th><th>Monto Pago 1ra Llamada</th></tr></thead><tbody>';
-      
-      list.forEach((s, idx) => {
-        let montoClass = 'empty', montoDisplay = '—';
-        if (s.montoNum !== null && s.montoNum > 0) { montoClass = 'paid'; montoDisplay = formatMoney(s.montoNum); }
-        else if (s.monto === '$0,00' || s.monto === '$0.00' || s.monto === '0') { montoClass = 'zero'; montoDisplay = '$0'; }
-        else if (s.monto) { montoClass = 'zero'; montoDisplay = s.monto; }
-        
-        html += '<tr><td style="color:#475569">' + (idx+1) + '</td>';
-        html += '<td>' + (s.nombre || '<span style="color:#475569">Sin nombre</span>') + '</td>';
-        html += '<td class="monto ' + montoClass + '">' + montoDisplay + '</td></tr>';
+    var html='';
+    for(var fecha of order){
+      var list=groups[fecha];
+      var label=dayLabel(fecha);
+      var hoy=isToday(fecha);
+      var pc=list.filter(function(s){return s.montoNum>0;}).length;
+      var fc=list.filter(function(s){return s.montoNum>0;}).reduce(function(a,s){return a+s.montoNum;},0);
+      html+='<div class="date-section"><div class="date-header"><h2>'+label+'</h2>';
+      if(hoy)html+='<span class="hoy-badge">HOY</span>';
+      html+='<span class="date-count">'+pc+'/'+list.length+' pagaron &middot; $'+fc.toLocaleString('es-AR')+'</span></div>';
+      html+='<table class="sessions-table"><thead><tr><th>#</th><th>Nombre</th><th>Monto 1ra Llamada</th></tr></thead><tbody>';
+      list.forEach(function(s,idx){
+        var cls='empty',disp='&#8212;';
+        if(s.montoNum>0){cls='paid';disp='$'+s.montoNum.toLocaleString('es-AR');}
+        else if(s.monto){cls='zero';disp=s.monto;}
+        html+='<tr><td style="color:#475569">'+(idx+1)+'</td><td>'+(s.nombre||'<span style="color:#475569">-</span>')+'</td><td class="monto '+cls+'">'+disp+'</td></tr>';
       });
-      
-      html += '</tbody></table></div>';
+      html+='</tbody></table></div>';
     }
     
-    if (html === '') {
-      container.innerHTML = '<div class="loading">No hay sesiones registradas aún.</div>';
-    } else {
-      container.innerHTML = html;
-    }
-    
-    const now = new Date();
-    document.getElementById('last-update').textContent = 'Última actualización: ' + now.toLocaleTimeString('es-AR') + ' · Auto-refresca cada 60s';
-    
-  } catch (err) {
-    container.innerHTML = '<div class="error">Error cargando datos: ' + err.message + '</div>';
-    document.getElementById('last-update').textContent = 'Error al cargar';
+    c.innerHTML=html||'<div class="loading">No hay sesiones registradas.</div>';
+    var n=new Date();
+    document.getElementById('last-update').textContent='Actualizado: '+n.toLocaleTimeString('es-AR')+' · Auto cada 60s';
+  }catch(e){
+    c.innerHTML='<div class="error">Error: '+e.message+'</div>';
   }
 }
 
 loadSessions();
-setInterval(loadSessions, 60000);
+setInterval(loadSessions,60000);
 </script>
 </body>
 </html>
