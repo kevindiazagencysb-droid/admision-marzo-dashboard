@@ -23,17 +23,17 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 .date-section{margin-bottom:28px}
 .date-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#1e293b;border-radius:10px 10px 0 0;border:1px solid #334155;border-bottom:none}
 .date-header h2{font-size:1rem;font-weight:600;color:#f1f5f9;text-transform:capitalize}
-.hoy-badge{background:#22c55e;color:white;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+.hoy-badge{background:#22c55e;color:white;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase}
 .date-count{margin-left:auto;font-size:.75rem;color:#64748b}
-.sessions-table{width:100%;border-collapse:collapse;background:#1e293b;border:1px solid #334155;border-radius:0 0 10px 10px;overflow:hidden}
-.sessions-table th{background:#0f172a;padding:10px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b;font-weight:600}
-.sessions-table td{padding:12px 14px;font-size:.875rem;border-top:1px solid #0f172a;background:#1e293b}
-.sessions-table tr:hover td{background:#0f172a}
-.monto.paid{color:#4ade80;font-weight:700}
-.monto.zero{color:#f87171}
-.monto.empty{color:#475569;font-style:italic}
+.tbl{width:100%;border-collapse:collapse;background:#1e293b;border:1px solid #334155;border-radius:0 0 10px 10px;overflow:hidden}
+.tbl th{background:#0f172a;padding:10px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#64748b;font-weight:600}
+.tbl td{padding:12px 14px;font-size:.875rem;border-top:1px solid #0f172a;background:#1e293b}
+.tbl tr:hover td{background:#0f172a}
+.paid{color:#4ade80;font-weight:700}
+.zero{color:#f87171}
+.empty{color:#475569;font-style:italic}
 .loading{text-align:center;padding:60px;color:#64748b}
-.error{text-align:center;padding:60px;color:#f87171}
+.error-msg{text-align:center;padding:60px;color:#f87171}
 </style>
 </head>
 <body>
@@ -42,132 +42,27 @@ body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-heig
 <p>Seguimiento de sesiones y pagos de 1ra llamada</p>
 </div>
 <div class="refresh-bar">
-<span id="last-update">Cargando...</span>
-<a onclick="loadSessions()">&#8635; Refrescar</a>
+<span id="lu">Cargando...</span>
+<a onclick="run()">&#8635; Refrescar</a>
 </div>
 <div class="container">
 <div class="kpi-grid">
-<div class="kpi-card"><div class="label">Total Agendas</div><div class="value blue" id="kpi-total">&#8212;</div></div>
-<div class="kpi-card"><div class="label">Pagaron</div><div class="value green" id="kpi-paid">&#8212;</div></div>
-<div class="kpi-card"><div class="label">Cash 1ra Llamada</div><div class="value green" id="kpi-cash">&#8212;</div></div>
-<div class="kpi-card"><div class="label">Tasa de Cierre</div><div class="value yellow" id="kpi-rate">&#8212;</div></div>
+<div class="kpi-card"><div class="label">Total Agendas</div><div class="value blue" id="k1">&#8212;</div></div>
+<div class="kpi-card"><div class="label">Pagaron</div><div class="value green" id="k2">&#8212;</div></div>
+<div class="kpi-card"><div class="label">Cash 1ra Llamada</div><div class="value green" id="k3">&#8212;</div></div>
+<div class="kpi-card"><div class="label">Tasa de Cierre</div><div class="value yellow" id="k4">&#8212;</div></div>
 </div>
-<div id="sessions-container"><div class="loading">Cargando sesiones...</div></div>
+<div id="sc"><div class="loading">Cargando sesiones...</div></div>
 </div>
 <script>
-var SHEET='https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
-var COL_FECHA=10,COL_MONTO=11,COL_NOMBRE=2;
-
-function parseCSV(t){
-  var rows=[],row=[],cur='',inQ=false;
-  for(var i=0;i<t.length;i++){
-    var c=t[i];
-    if(c==='"'){if(inQ&&t[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
-    else if(c===','&&!inQ){row.push(cur);cur='';}
-    else if((c==='
-'||c==='
-')&&!inQ){if(c==='
-'&&t[i+1]==='
-')i++;row.push(cur);cur='';rows.push(row);row=[];}
-    else cur+=c;
-  }
-  if(row.length>0){row.push(cur);rows.push(row);}
-  return rows;
-}
-
-function parseMonto(v){
-  if(!v||v.trim()===''||v.trim()==='?')return null;
-  var n=parseFloat(v.replace(/[^0-9.-]/g,'').replace(',','.'));
-  return isNaN(n)?null:n;
-}
-
-function fmtMoney(n){
-  if(n===null)return '&#8212;';
-  return '$'+n.toLocaleString('es-AR',{minimumFractionDigits:0});
-}
-
-function dayLabel(s){
-  if(!s)return s;
-  var p=s.split('/');
-  if(p.length!==3)return s;
-  var d=new Date(+p[2],+p[0]-1,+p[1]);
-  var days=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
-  var months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  return days[d.getDay()]+' '+d.getDate()+' '+months[d.getMonth()]+' '+p[2];
-}
-
-function isToday(s){
-  if(!s)return false;
-  var p=s.split('/');
-  if(p.length!==3)return false;
-  var n=new Date();
-  return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();
-}
-
-async function loadSessions(){
-  var c=document.getElementById('sessions-container');
-  try{
-    var resp=await fetch(SHEET+'&t='+Date.now());
-    var text=await resp.text();
-    var rows=parseCSV(text);
-    if(rows.length<2){c.innerHTML='<div class="error">No hay datos en el sheet.</div>';return;}
-    
-    var sessions=[];
-    for(var i=1;i<rows.length;i++){
-      var r=rows[i];
-      var fecha=r[COL_FECHA]?r[COL_FECHA].trim():'';
-      var monto=r[COL_MONTO]?r[COL_MONTO].trim():'';
-      var nombre=r[COL_NOMBRE]?r[COL_NOMBRE].trim():'';
-      if(!fecha||!/d+/d+/d+/.test(fecha))continue;
-      sessions.push({nombre:nombre,fecha:fecha,monto:monto,montoNum:parseMonto(monto)});
-    }
-    
-    var groups={},order=[];
-    for(var s of sessions){
-      if(!groups[s.fecha]){groups[s.fecha]=[];order.push(s.fecha);}
-      groups[s.fecha].push(s);
-    }
-    
-    var total=sessions.length;
-    var paid=sessions.filter(function(s){return s.montoNum>0;});
-    var cash=paid.reduce(function(a,s){return a+s.montoNum;},0);
-    var rate=total>0?Math.round(paid.length/total*100):0;
-    
-    document.getElementById('kpi-total').textContent=total;
-    document.getElementById('kpi-paid').textContent=paid.length;
-    document.getElementById('kpi-cash').textContent='$'+cash.toLocaleString('es-AR');
-    document.getElementById('kpi-rate').textContent=rate+'%';
-    
-    var html='';
-    for(var fecha of order){
-      var list=groups[fecha];
-      var label=dayLabel(fecha);
-      var hoy=isToday(fecha);
-      var pc=list.filter(function(s){return s.montoNum>0;}).length;
-      var fc=list.filter(function(s){return s.montoNum>0;}).reduce(function(a,s){return a+s.montoNum;},0);
-      html+='<div class="date-section"><div class="date-header"><h2>'+label+'</h2>';
-      if(hoy)html+='<span class="hoy-badge">HOY</span>';
-      html+='<span class="date-count">'+pc+'/'+list.length+' pagaron &middot; $'+fc.toLocaleString('es-AR')+'</span></div>';
-      html+='<table class="sessions-table"><thead><tr><th>#</th><th>Nombre</th><th>Monto 1ra Llamada</th></tr></thead><tbody>';
-      list.forEach(function(s,idx){
-        var cls='empty',disp='&#8212;';
-        if(s.montoNum>0){cls='paid';disp='$'+s.montoNum.toLocaleString('es-AR');}
-        else if(s.monto){cls='zero';disp=s.monto;}
-        html+='<tr><td style="color:#475569">'+(idx+1)+'</td><td>'+(s.nombre||'<span style="color:#475569">-</span>')+'</td><td class="monto '+cls+'">'+disp+'</td></tr>';
-      });
-      html+='</tbody></table></div>';
-    }
-    
-    c.innerHTML=html||'<div class="loading">No hay sesiones registradas.</div>';
-    var n=new Date();
-    document.getElementById('last-update').textContent='Actualizado: '+n.toLocaleTimeString('es-AR')+' · Auto cada 60s';
-  }catch(e){
-    c.innerHTML='<div class="error">Error: '+e.message+'</div>';
-  }
-}
-
-loadSessions();
-setInterval(loadSessions,60000);
+var SH='https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
+function csv(t){var R=[],r=[],c='',q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(ch==='"'){if(q&&t[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){r.push(c);c='';}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';R.push(r);r=[];}else c+=ch;}if(r.length){r.push(c);R.push(r);}return R;}
+function pm(v){if(!v||!v.trim()||v.trim()==='?')return null;var n=parseFloat(v.replace(/[^0-9.-]/g,'').replace(',','.'));return isNaN(n)?null:n;}
+function fm(n){return n===null?'&#8212;':'$'+n.toLocaleString('es-AR');}
+function dl(s){if(!s)return s;var p=s.split('/');if(p.length!==3)return s;var d=new Date(+p[2],+p[0]-1,+p[1]);var dn=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];var mn=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];return dn[d.getDay()]+' '+d.getDate()+' '+mn[d.getMonth()]+' '+p[2];}
+function it(s){if(!s)return false;var p=s.split('/');if(p.length!==3)return false;var n=new Date();return +p[0]-1===n.getMonth()&&+p[1]===n.getDate()&&+p[2]===n.getFullYear();}
+async function run(){var c=document.getElementById('sc');try{var r=await fetch(SH+'&t='+Date.now());var tx=await r.text();var rows=csv(tx);if(rows.length<2){c.innerHTML='<div class="error-msg">Sin datos.</div>';return;}var ses=[];for(var i=1;i<rows.length;i++){var rw=rows[i];var fe=rw[10]?rw[10].trim():'';var mo=rw[11]?rw[11].trim():'';var no=rw[2]?rw[2].trim():'';if(!fe||!/\d+\/\d+\/\d+/.test(fe))continue;ses.push({n:no,f:fe,m:mo,mn:pm(mo)});}var g={},o=[];for(var s of ses){if(!g[s.f]){g[s.f]=[];o.push(s.f);}g[s.f].push(s);}var tot=ses.length;var pd=ses.filter(function(x){return x.mn>0;});var ca=pd.reduce(function(a,x){return a+x.mn;},0);var rt=tot>0?Math.round(pd.length/tot*100):0;document.getElementById('k1').textContent=tot;document.getElementById('k2').textContent=pd.length;document.getElementById('k3').textContent='$'+ca.toLocaleString('es-AR');document.getElementById('k4').textContent=rt+'%';var h='';for(var fe of o){var ls=g[fe];var lab=dl(fe);var hoy=it(fe);var pc=ls.filter(function(x){return x.mn>0;}).length;var fc=ls.filter(function(x){return x.mn>0;}).reduce(function(a,x){return a+x.mn;},0);h+='<div class="date-section"><div class="date-header"><h2>'+lab+'</h2>';if(hoy)h+='<span class="hoy-badge">HOY</span>';h+='<span class="date-count">'+pc+'/'+ls.length+' pagaron &middot; $'+fc.toLocaleString('es-AR')+'</span></div><table class="tbl"><thead><tr><th>#</th><th>Nombre</th><th>Monto 1ra Llamada</th></tr></thead><tbody>';ls.forEach(function(x,i){var cl='empty',dp='&#8212;';if(x.mn>0){cl='paid';dp='$'+x.mn.toLocaleString('es-AR');}else if(x.m){cl='zero';dp=x.m;}h+='<tr><td style="color:#475569">'+(i+1)+'</td><td>'+(x.n||'-')+'</td><td class="'+cl+'">'+dp+'</td></tr>';});h+='</tbody></table></div>';}c.innerHTML=h||'<div class="loading">Sin sesiones aun.</div>';var nd=new Date();document.getElementById('lu').textContent='Actualizado: '+nd.toLocaleTimeString('es-AR')+' (auto 60s)';}catch(e){c.innerHTML='<div class="error-msg">Error: '+e.message+'</div>';}}
+run();setInterval(run,60000);
 </script>
 </body>
 </html>
