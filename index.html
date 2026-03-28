@@ -375,6 +375,239 @@ tr:hover td{background:#23263a}
 <tr><td>44</td><td>rafaelmoralese2</td><td>rafael.morales85@icloud.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
 </table></div>
 </div>
+<div id="admision-sessions-container">
+<div class="card" style="margin-bottom:24px;text-align:center;padding:40px">
+<div style="color:#a0aac0">Cargando sesiones de admision...</div>
+</div>
+</div>
+<div class="card" style="margin-bottom:24px">
+<div class="st">Notas y Conclusiones del Cierre</div>
+<div class="note"><strong>NOTA 1 - Klarna Eliminado</strong><p>Gleidy Yosimar (gleidyyosimar@gmail.com) removido. Pago via Klarna quedo INCOMPLETO, no ingreso al programa.</p></div>
+<div class="note"><strong>NOTA 2 - Canal Dominante: WHOP</strong><p>38 de 44 ventas (86.7%) vinieron por WHOP. Priorizar este canal en proximos procesos.</p></div>
+<div class="note"><strong>NOTA 3 - Cierre Emocional Nocturno</strong><p>Los 5 pagos de Stripe ocurrieron entre 23:06-23:38 en una sola noche. Indica cierre grupal altamente efectivo.</p></div>
+<div class="note"><strong>NOTA 4 - Saldo Pendiente Prioritario</strong><p>$110,000 USD en saldo por cobrar (44 x $2,500). Seguimiento activo en primeros 30 dias post-ingreso.</p></div>
+<div class="note"><strong>NOTA 5 - ICP Confirmado</strong><p>Comprador tipico: 35-54 anos, $0-$3K ingreso, quiere aprender ventas, decide sin consultar, 100% comprometido.</p></div>
+</div>
+<div style="text-align:center;color:#636e72;font-size:.75rem;padding:16px 0">Dashboard Admision Marzo 2026 | kevindiazagencysb | 26 Mar 2026</div>
+</div>
+<script>
+Chart.defaults.color='#a0aac0';Chart.defaults.borderColor='#2d3436';
+new Chart(document.getElementById('c1'),{type:'doughnut',data:{labels:['WHOP (38)','STRIPE (5)','ZELLE (1)'],datasets:[{data:[38,5,1],backgroundColor:['#27ae60','#2980b9','#f39c12'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{padding:10,font:{size:10}}}}}});
+new Chart(document.getElementById('c2'),{type:'bar',data:{labels:['STRIPE','WHOP','ZELLE'],datasets:[{label:'Cobrado',data:[2500,18981,500],backgroundColor:'#00b894'},{label:'Pendiente',data:[12500,95000,2500],backgroundColor:'#d63031'}]},options:{scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString()}}},plugins:{legend:{position:'bottom'}}}});
+new Chart(document.getElementById('c3'),{type:'bar',data:{labels:['18-24','25-34','35-44','45-54','55-64','+64'],datasets:[{label:'Leads',data:[15,37,68,99,60,23],backgroundColor:['#74b9ff','#a29bfe','#fd79a8','#fdcb6e','#e17055','#55efc4'],borderRadius:5}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+new Chart(document.getElementById('c4'),{type:'pie',data:{labels:['Quiere aprender (62%)','Trabaja sin resultados (38%)'],datasets:[{data:[188,115],backgroundColor:['#6c5ce7','#e17055'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:10}}}}}});
+
+// ====== SESIONES DINAMICAS - GOOGLE SHEETS ======
+(function(){
+const SHEET_URL='https://docs.google.com/spreadsheets/d/1oBuUI3m6z_mRxKnzDuzZseqMZ9kOp4_vm_DMS7ghzpo/gviz/tq?tqx=out:csv&sheet=Marzo';
+function parseCSV(line){const r=[];let q=false,c='';for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){r.push(c);c='';}else c+=ch;}r.push(c);return r;}
+function parseMonto(v){if(!v||v==='-'||v==='?'||v==='')return null;const n=parseFloat(v.replace(/[$s.]/g,'').replace(',','.'));return isNaN(n)?null:n;}
+function fmtMonto(v){const n=parseMonto(v);if(n===null)return '<span style="color:#636e72">-</span>';if(n<=0)return '<span style="color:#e17055">$0</span>';return '<span style="color:#00b894;font-weight:700">$'+n.toLocaleString('en-US')+'</span>';}
+function badge(s){if(!s)return '<span style="color:#636e72">-</span>';if(s.includes('Completed'))return '<span style="color:#00b894;font-weight:700">Completado</span>';if(s==='Active')return '<span style="color:#74b9ff;font-weight:700">Activo</span>';return '<span style="color:#fdcb6e">'+s+'</span>';}
+function isToday(d){const t=new Date(),day=t.getDate(),mo=t.getMonth()+1;const ms={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,octubre:10,noviembre:11,diciembre:12};const lo=d.toLowerCase();for(const[mn,mn2]of Object.entries(ms)){if(lo.includes('de '+mn)){const m=lo.match(/(\d+)\s+de/);if(m&&parseInt(m[1])===day&&mn2===mo)return true;}}return false;}
+window.loadSessions=async function(){
+const cont=document.getElementById('admision-sessions-container');
+if(!cont)return;
+try{
+const resp=await fetch(SHEET_URL+'&_cache='+Date.now());
+const csv=await resp.text();
+const hdr=parseCSV(csv.split('\n')[0]);
+let cl='',inQ=false;
+for(let i=0;i<csv.length;i++){if(csv[i]==='"')inQ=!inQ;if(csv[i]==='\n'&&inQ)cl+=' | ';else cl+=csv[i];}
+const rows=cl.split('\n').filter(r=>r.trim()).slice(1).map(r=>parseCSV(r));
+const all=rows.filter(r=>r[0]&&r[0].trim()).map(row=>{const o={};hdr.forEach((h,i)=>{o[h]=row[i]||'';});return o;});
+const byDate={};const dOrder=[];
+all.forEach(r=>{
+const fh=r['Fecha - hora'];
+let dt=fh.includes(' | ')?fh.split(' | ')[0]:fh.split('\n')[0];dt=dt.trim();
+let hr=fh.includes(' | ')?fh.split(' | ')[1]:(fh.split('\n')[1]||'');hr=hr.replace(/\(E[DS]T\)/g,'').trim();
+if(!byDate[dt]){byDate[dt]=[];dOrder.push(dt);}
+byDate[dt].push({nombre:r['Nombre'],hora:hr,monto:r['Monto Pago de 1era Llamada'],status:r['Plan Status'],method:r['Payment Method'],planPago:r['Plan de Pago'],notes:r['Notes']});
+});
+let gT=0,gP=0,gS=0;
+Object.values(byDate).forEach(ss=>ss.forEach(s=>{gS++;const n=parseMonto(s.monto);if(n&&n>0){gT+=n;gP++;}}));
+let html=`<div class="card" style="margin-bottom:24px">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+<div class="st" style="margin-bottom:0">Sesiones de Admision MARZO 2026</div>
+<a href="#" onclick="loadSessions();return false;" style="color:#74b9ff;font-size:.8rem">Refrescar</a>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:8px">
+<div style="background:#1e2130;border-radius:10px;padding:12px;text-align:center"><div style="color:#a0aac0;font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Total Sesiones</div><div style="font-size:1.5rem;font-weight:900;color:#fff">${gS}</div></div>
+<div style="background:#1e2130;border-radius:10px;padding:12px;text-align:center"><div style="color:#a0aac0;font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Pagaron 1ra Llamada</div><div style="font-size:1.5rem;font-weight:900;color:#00b894">${gP}</div></div>
+<div style="background:#1e2130;border-radius:10px;padding:12px;text-align:center"><div style="color:#a0aac0;font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Cash 1ra Llamada</div><div style="font-size:1.5rem;font-weight:900;color:#00cec9">$${gT.toLocaleString('en-US')}</div></div>
+<div style="background:#1e2130;border-radius:10px;padding:12px;text-align:center"><div style="color:#a0aac0;font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Tasa Cierre</div><div style="font-size:1.5rem;font-weight:900;color:#fdcb6e">${gS>0?Math.round(gP/gS*100):0}%</div></div>
+</div>
+<p style="color:#636e72;font-size:.7rem;text-align:right">Auto-refresh cada 60s · Fuente: Google Sheets</p>
+</div>`;
+dOrder.forEach(dt=>{
+const ss=byDate[dt];const hoy=isToday(dt);
+let dT=0,dP=0;ss.forEach(s=>{const n=parseMonto(s.monto);if(n&&n>0){dP++;dT+=n;}});
+const lbl=dt.charAt(0).toUpperCase()+dt.slice(1);
+const todayBadge=hoy?' <span style="background:#00b894;color:#000;font-size:.6rem;padding:2px 7px;border-radius:10px;font-weight:700;vertical-align:middle">HOY</span>':'';
+html+=`<div class="card" style="margin-bottom:14px;${hoy?'border:1px solid #00b894;background:rgba(0,184,148,.04)':''}">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+<div class="st" style="margin-bottom:0;font-size:.9rem">${lbl}${todayBadge}</div>
+<div style="display:flex;gap:14px;font-size:.78rem"><span style="color:#a0aac0">${ss.length} sesiones</span><span style="color:#00b894">${dP} pagaron</span><span style="color:#00cec9;font-weight:700">$${dT.toLocaleString('en-US')}</span></div>
+</div>
+<div style="overflow-x:auto"><table>
+<tr><th>#</th><th>Nombre</th><th>Hora</th><th>Status</th><th>Monto 1ra Llamada</th><th>Metodo</th><th>Plan / Notas</th></tr>
+${ss.map((s,i)=>`<tr><td>${i+1}</td><td>${s.nombre}</td><td style="white-space:nowrap;font-size:.78rem">${s.hora}</td><td>${badge(s.status)}</td><td>${fmtMonto(s.monto)}</td><td style="font-size:.78rem">${s.method||'<span style="color:#636e72">-</span>'}</td><td style="font-size:.72rem;color:#a0aac0;max-width:140px">${s.planPago||(s.notes?s.notes.slice(0,50)+(s.notes.length>50?'…':''):'-')}</td></tr>`).join('')}
+</table></div>
+</div>`;
+});
+cont.innerHTML=html;
+}catch(e){cont.innerHTML=`<div class="card" style="margin-bottom:24px"><div class="st">Sesiones de Admision</div><p style="color:#e17055">Error: ${e.message} <a href="#" onclick="loadSessions();return false;" style="color:#74b9ff">Reintentar</a></p></div>`;}
+};
+loadSessions();
+setInterval(loadSessions,60000);
+})();
+// ====== FIN SESIONES DINAMICAS ======</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dashboard Admision Marzo 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0f1117;color:#e0e6f0;min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:28px 40px;border-bottom:3px solid #00b894}
+.topbar h1{font-size:1.7rem;font-weight:800;color:#fff}
+.topbar p{color:#a0aac0;font-size:.85rem;margin-top:5px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-left:8px}
+.badge-g{background:#00b894;color:#fff}.badge-r{background:#d63031;color:#fff}
+.wrap{max-width:1400px;margin:0 auto;padding:32px 24px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:32px}
+.k{border-radius:14px;padding:22px 16px;text-align:center}
+.k .l{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;opacity:.8;margin-bottom:8px}
+.k .v{font-size:1.75rem;font-weight:900;line-height:1}
+.k .s{font-size:.72rem;opacity:.65;margin-top:5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:24px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;margin-bottom:24px}
+.card{background:#1e2130;border-radius:14px;padding:22px;box-shadow:0 2px 16px rgba(0,0,0,.3)}
+.st{font-size:1rem;font-weight:700;color:#fff;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #2d3436}
+canvas{max-height:250px}
+table{width:100%;border-collapse:collapse;font-size:.81rem}
+th{background:#2a2d3a;color:#a0aac0;padding:9px 12px;text-align:left;font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.4px}
+td{padding:8px 12px;border-bottom:1px solid #252840}
+tr:hover td{background:#23263a}
+.p{display:inline-block;padding:2px 8px;border-radius:8px;font-weight:700;font-size:.7rem}
+.ps{background:#1a5276;color:#aed6f1}.pw{background:#1e6a44;color:#a9dfbf}.pz{background:#7d6608;color:#f9e79f}
+.ok{color:#00b894;font-weight:700}
+.icp td:first-child{font-weight:700;color:#a29bfe;min-width:150px}
+.icp td:nth-child(2){color:#fff;font-weight:600;min-width:200px}
+.icp td:nth-child(3){color:#a0aac0;font-size:.79rem}
+.note{background:#1a1a2e;border-left:4px solid #f39c12;padding:12px 16px;border-radius:0 10px 10px 0;margin-bottom:10px}
+.note strong{color:#f39c12;font-size:.79rem}
+.note p{color:#a0aac0;font-size:.8rem;margin-top:3px}
+.bar{height:26px;border-radius:6px;display:flex;align-items:center;padding:0 12px;font-weight:700;font-size:.8rem;margin-bottom:8px;color:#fff}
+@media(max-width:768px){.g2,.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar">
+<h1>Dashboard Admision Marzo 2026 <span class="badge badge-g">LIVE</span></h1>
+<p>44 compradores confirmados | Generado 28 Mar 2026 | Klarna eliminado <span class="badge badge-r">Gleidy Yosimar removido</span></p>
+</div>
+<div class="wrap">
+<div class="kpi">
+<div class="k" style="background:linear-gradient(135deg,#00b894,#00cec9)"><div class="l">Cash Collected</div><div class="v">$22,461</div><div class="s">Down payments</div></div>
+<div class="k" style="background:linear-gradient(135deg,#0984e3,#74b9ff)"><div class="l">Clientes Pagados</div><div class="v">44</div><div class="s">Stripe+WHOP+Zelle</div></div>
+<div class="k" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe)"><div class="l">Ticket Total</div><div class="v">$3,000</div><div class="s">Por cliente USD</div></div>
+<div class="k" style="background:linear-gradient(135deg,#e17055,#fab1a0)"><div class="l">Pendiente x Cobrar</div><div class="v">$110,000</div><div class="s">44 x $2,500</div></div>
+<div class="k" style="background:linear-gradient(135deg,#d63031,#ff7675)"><div class="l">Proyeccion Total</div><div class="v">~$112K</div><div class="s">80% tasa cobro</div></div>
+<div class="k" style="background:linear-gradient(135deg,#fdcb6e,#e17055)"><div class="l">Canal Lider</div><div class="v">WHOP</div><div class="s">86.7% de ventas</div></div>
+<div class="k" style="background:linear-gradient(135deg,#2d3436,#636e72)"><div class="l">Valor 100% Cobro</div><div class="v">$132K</div><div class="s">44 x $3,000</div></div>
+</div>
+<div class="g3">
+<div class="card"><div class="st">Ventas por Plataforma</div><canvas id="c1"></canvas></div>
+<div class="card"><div class="st">Cash Cobrado vs Pendiente</div><canvas id="c2"></canvas></div>
+<div class="card"><div class="st">Distribucion de Edad MARZO</div><canvas id="c3"></canvas></div>
+</div>
+<div class="g2">
+<div class="card"><div class="st">Situacion en Ventas</div><canvas id="c4"></canvas></div>
+<div class="card">
+<div class="st">Proyeccion de Recoleccion</div>
+<div class="bar" style="background:#00b894">Down Payments Cobrados $22,461</div>
+<div class="bar" style="background:#0984e3">Saldo Estimado 80% $88,000</div>
+<div class="bar" style="background:#6c5ce7;width:55%">Proyeccion Total ~$112,461</div>
+<table style="margin-top:12px">
+<tr><th>Concepto</th><th>Monto</th><th>Status</th></tr>
+<tr><td>Down Payments</td><td style="color:#00b894;font-weight:700">$22,461</td><td style="color:#00b894">Confirmado</td></tr>
+<tr><td>Saldo Restante</td><td>$110,000</td><td style="color:#fdcb6e">Pendiente</td></tr>
+<tr><td>Cobro Est. 80%</td><td style="color:#74b9ff;font-weight:700">$88,000</td><td style="color:#a0aac0">Proyectado</td></tr>
+<tr style="background:#1a1a2e"><td><b>TOTAL PROYECTADO</b></td><td style="color:#00cec9;font-weight:800">~$112,461</td><td style="color:#a0aac0">80% tasa</td></tr>
+</table>
+</div>
+</div>
+<div class="card" style="margin-bottom:24px">
+<div class="st">Perfil del Comprador Ideal ICP - Datos reales MARZO</div>
+<div style="overflow-x:auto"><table class="icp">
+<tr><th>Dimension</th><th>Dato Clave</th><th>Analisis</th></tr>
+<tr><td>Edad</td><td>35-54 anos</td><td>Etapa productiva buscando cambio economico real con mayor capacidad de decision autonoma</td></tr>
+<tr><td>Situacion</td><td>Quiere aprender a vender</td><td>62% sin experiencia, alta motivacion de transformacion desde cero</td></tr>
+<tr><td>Ingreso actual</td><td>$0-$3,000 USD/mes</td><td>Ve el programa como la salida concreta, el dolor economico es el principal motivador</td></tr>
+<tr><td>Decision</td><td>Decide solo, sin consultar</td><td>88% sin friccion de pareja o socio, cierres rapidos y directos en la llamada</td></tr>
+<tr><td>Compromiso</td><td>98% dijo 100% comprometido</td><td>Llega pre-calificado, la llamada solo confirma lo que ya decidio</td></tr>
+<tr><td>Canal origen</td><td>WHOP 86.7% + Stripe Link</td><td>WHOP genera el grueso del volumen con audiencia ya comprometida</td></tr>
+<tr><td>Horario compra</td><td>23:06-23:38 del 26 mar</td><td>Decision emocional nocturna, post llamada en vivo o cierre grupal efectivo</td></tr>
+<tr><td>Por que compraron</td><td>Dolor + Solucion + Confianza</td><td>Ingreso bajo + quiere aprender ventas + llego comprometido = formula perfecta de conversion</td></tr>
+</table></div>
+</div>
+<div class="card" style="margin-bottom:24px">
+<div class="st">Detalle de Compradores - 44 confirmados</div>
+<div style="overflow-x:auto;max-height:480px">
+<table>
+<tr><th>#</th><th>Nombre</th><th>Email</th><th>Canal</th><th>Monto</th><th>Estado</th><th>Pendiente</th><th>Fecha</th></tr>
+<tr><td>1</td><td>Ana Marie</td><td>anamarie2029@gmail.com</td><td><span class="p ps">STRIPE</span></td><td>$500</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar 23:38</td></tr>
+<tr><td>2</td><td>Zulay New York</td><td>zulaynewyork@aol.com</td><td><span class="p ps">STRIPE</span></td><td>$500</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar 23:24</td></tr>
+<tr><td>3</td><td>Arnoldo Barinas</td><td>arnoldobarinas2017@gmail.com</td><td><span class="p ps">STRIPE</span></td><td>$500</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar 23:15</td></tr>
+<tr><td>4</td><td>Leidis</td><td>leidis8@hotmail.com</td><td><span class="p ps">STRIPE</span></td><td>$500</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar 23:08</td></tr>
+<tr><td>5</td><td>G. Londono</td><td>glondono777@gmail.com</td><td><span class="p ps">STRIPE</span></td><td>$500</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar 23:06</td></tr>
+<tr><td>6</td><td>Cliente Zelle</td><td>zelle@manual.com</td><td><span class="p pz">ZELLE</span></td><td>$500</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>7</td><td>acrivera</td><td>acrivera81@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>8</td><td>stheffany</td><td>stheffany_92@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>9</td><td>cosykale</td><td>ruizjac@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>10</td><td>tidalwallop</td><td>robert_rangel@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>11</td><td>joaru</td><td>joaru62@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>12</td><td>filmyriding49</td><td>jp@cu4driga.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>13</td><td>josemolinaf133</td><td>josemolina2471@yahoo.es</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>14</td><td>blindmilk94</td><td>yolettemendezca@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>15</td><td>marrvinyac</td><td>marrvinyac90@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>16</td><td>Erick Jose Tabata</td><td>ericktabata@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>17</td><td>sorayamea</td><td>sorayam_78@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>18</td><td>inertpassage</td><td>claudialazor@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>19</td><td>keypallet04</td><td>italoromero@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>20</td><td>juanafrias</td><td>juanafrias701@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>21</td><td>minorbutler</td><td>nirsypp@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>22</td><td>lrojase4</td><td>lrojas929@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>23</td><td>elicp</td><td>elicp68@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>24</td><td>leticiagarci</td><td>leticiagarci77@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>25</td><td>joannaf</td><td>joannaf2012@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>26</td><td>ceciliano</td><td>ceciliano4037@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>27</td><td>Julianne Pacheco</td><td>jnlianne@icloud.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>28</td><td>sizedattack9e</td><td>albanisjsh@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>29</td><td>luckyhick61</td><td>lsld@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>30</td><td>dueimage60</td><td>coolmanpr@aol.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>31</td><td>drierhusband23</td><td>elidachapa@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>32</td><td>soybrendarojas</td><td>soybrendarojas2026@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>33</td><td>rosarioggarcia</td><td>rosarioggarcia2014@yahoo.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>34</td><td>Davest</td><td>davest2789@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>35</td><td>jos7f</td><td>jos2392@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>36</td><td>Arsy Jimenez</td><td>arsyatusa@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>37</td><td>elenaibarra</td><td>elenaibarra2121@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>38</td><td>strayopen</td><td>jenesis_r@icloud.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>39</td><td>tensecanal3f</td><td>barriosjoh@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>40</td><td>gemu</td><td>gemu7967@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>41</td><td>gustyeclipse</td><td>kimberly.aroca@icloud.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>42</td><td>cacheiro</td><td>cacheiro19@hotmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>43</td><td>DANIELE FERRARI</td><td>danieleferrari697@gmail.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+<tr><td>44</td><td>rafaelmoralese2</td><td>rafael.morales85@icloud.com</td><td><span class="p pw">WHOP</span></td><td>$499</td><td class="ok">Pagado</td><td>$2,500</td><td>26 mar</td></tr>
+</table></div>
+</div>
 <div class="card" style="margin-bottom:24px">
 <div class="st">Sesiones de Admision - Sabado 28 Mar 2026</div>
 <p style="color:#a0aac0;font-size:.85rem;margin-bottom:12px">Se presentaron hoy: <strong style="color:#fff">8 personas</strong> &nbsp;|&nbsp; Pagaron 1ra Llamada: <strong style="color:#00b894">0</strong> &nbsp;|&nbsp; Monto Cobrado: <strong style="color:#00cec9">$0</strong></p>
